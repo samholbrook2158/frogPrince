@@ -32,4 +32,4 @@ Go to browser and enter "localhost:3000/login"
 
 ## Information
 
-Views folder holds html files that, public/css folder is all the css files. Main javascript files are in main folder.
+Views folder holds html files that are ejs file format (embedded javascript), public/css folder is all the css files. Main javascript files are in main folder.
