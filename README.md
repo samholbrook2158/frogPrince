@@ -30,6 +30,6 @@ Click new terminal in vscode and enter "nodemon app.js"
 
 Go to browser and enter "localhost:3000/login"
 
-### Information
+## Information
 
 Views folder holds html files that, public/css folder is all the css files. Main javascript files are in main folder.
