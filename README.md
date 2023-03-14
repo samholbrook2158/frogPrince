@@ -29,3 +29,7 @@ Inside terminal with project open enter "npm install". This should install all p
 Click new terminal in vscode and enter "nodemon app.js"
 
 Go to browser and enter "localhost:3000/login"
+
+### Information
+
+Views folder holds html files that, public/css folder is all the css files. Main javascript files are in main folder.
