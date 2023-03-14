@@ -3,6 +3,7 @@
 ## Steps to set up
 
 Download vs code: https://code.visualstudio.com/download 
+Download node.js: https://nodejs.org/en/download/
 Download xampp: https://www.apachefriends.org/download.html
 start apache server and mysql.
 
@@ -20,6 +21,7 @@ For the messages table: "CREATE TABLE messages (
   user_id INT(11)
 );"
 
+Inside terminal with project open enter "npm install". This should install all packages based off what is inside the packages folder that you installed.
 Click new terminal in vscode and enter "nodemon app.js"
 
 Go to browser and enter "localhost:3000/login"
