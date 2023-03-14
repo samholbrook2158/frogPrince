@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="css/dashboard.css" />
+  </head>
+  <body>
+    <!-- Navigation bar -->
+    <nav class="nav-bar">
+      <!-- Logout and Friends buttons -->
+      <div class="dropdown">
+        <div class="dropdown-content">
+          <a href="/account" class="nav-button">Account</a>
+          <a href="/logout" class="nav-button">Sign out</a>
+          <a href="/friends" class="nav-button">Friends</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Main content -->
+    <main>
+      <h1>frogPrince Dashboard, hi <%= username %>!</h1>
+      <p>Here you can access your messages.</p>
+      <a href="/messages" class="message-button">Go to Messages</a>
+      <p>Here you can manage your friends.</p>
+      <a href="/friends" class="message-button">Go to Friends</a>
+    </main>
+
+    <script>
+      function toggleMenu() {
+        const dropdown = document.querySelector(".dropdown");
+        const hamburger = document.querySelector(".hamburger");
+        dropdown.classList.toggle("active");
+        hamburger.classList.toggle("active");
+      }
+    </script>
+  </body>
+</html>

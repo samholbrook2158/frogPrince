@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/login.css" />
+    <style>
+      button {
+        margin-right: 10px;
+      }
+      .form-container {
+        position: relative;
+        text-align: center;
+      }
+      .error-message {
+        display: inline-block;
+        color: red;
+        border: 1px solid red;
+        border-radius: 5px;
+        padding: 5px;
+        margin-top: 1px;
+        margin-bottom: 20px;
+      }
+      .logo {
+        display: block;
+        margin: 50px auto;
+        width: 150px;
+        height: 150px;
+        background-image: url("/images/frogPrince.png");
+        background-repeat: no-repeat;
+        background-size: contain;
+        border: 1px solid black;
+        border-radius: 50%;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+      .title {
+        font-family: 'Nordique Inline', sans-serif;
+        display: block;
+        margin: 0 auto;
+        text-align: center;
+        border: 2px solid #333;
+        padding: 10px;
+        width: 30%;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="logo"></div>
+    <div class="title"><h1>frogPrince</h1></div>
+    <form method="POST" action="/login" id="loginForm">
+        <label>Username</label>
+        <input type="text" name="username" required /><br /><br />
+        <label>Password</label>
+        <input type="password" name="password" required /><br /><br />
+        <div class="form-container">
+          <% if (typeof error !== 'undefined' && error) { %>
+          <p class="error-message"><%= error %></p>
+          <% } %>
+          <button type="submit" class="login-button">Login</button>
+        </div>
+      </form>
+      <form method="GET" action="/signup">
+        <button type="submit" class="signup-button">Create Account</button>
+      </form>
+      
+    <script>
+      window.onload = function () {
+        document.getElementById("loginForm").reset();
+        localStorage.removeItem("errorMessage");
+      };
+
+      // Check if there is an error message
+      var errorMessage = document.getElementById("errorMessage");
+      if (errorMessage) {
+        // Reset the error message
+        errorMessage.innerHTML = "";
+        localStorage.removeItem("errorMessage");
+      }
+    </script>
+  </body>
+</html>

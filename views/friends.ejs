@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Friend Search</title>
+    <link rel="stylesheet" type="text/css" href="/css/style.css">
+</head>
+<body>
+    <h1>Friends</h1>
+
+<form method="post" action="/friend/search">
+  <input type="text" name="query" placeholder="Search for friends...">
+  <button type="submit">Search</button>
+</form>
+
+<% if (Array.isArray(results) && results.length > 0) { %>
+    <% results.forEach(function(result) { %>
+      <li><%= result.username %></li>
+    <% }); %>
+  <% } else { %>
+    <p>No results found.</p>
+  <% } %>
+  
+  
+</body>
+</html>
