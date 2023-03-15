@@ -26,7 +26,7 @@ For the messages table: "CREATE TABLE messages (
 
 Inside terminal with project open enter "npm install". This should install all packages based off what is inside the packages folder that you installed.
 
-Click new terminal in vscode and enter "nodemon app.js"
+Click new terminal in vscode and enter "nodemon app.js". Using nodemon instead of node allows for server to automatically restart when any change are saved
 
 Go to browser and enter "localhost:3000/login"
 
