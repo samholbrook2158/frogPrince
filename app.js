@@ -116,37 +116,7 @@ app.post('/signup', function (req, res) {
         }
     });
 });
-
-app.get('/friends', function(req, res) {
-    res.render('friends', { results: results });
-    let query = req.query.search;
-    User.find({username: {$regex: query, $options: '$i'}}, function(err, results) {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render('friends', {results: results});
-      }
-    });
-  });
-   
-// Display the friend search page
-app.post('/friends/search', (req, res) => {
-    const query = req.body.query;
-  
-    // Search for users with usernames or emails that match the query
-    const sql = `SELECT * FROM users WHERE username LIKE '%${query}%' OR email LIKE '%${query}%'`;
-    db.query(sql, (err, results) => {
-      if (err) {
-        console.error(err);
-        res.sendStatus(500);
-        return;
-      }
-      // Render the search results on the friend.ejs page
-      res.render('friends', { results });
-    });
-});
-  
-  
+ 
   
 // Mount the Express.js middleware
 app.use("/", ExpressApp);
