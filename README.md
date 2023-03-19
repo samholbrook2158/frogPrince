@@ -47,7 +47,7 @@ For the chatting with friends table: "CREATE TABLE friend_chats (
 
 Inside terminal with project open enter "npm install". This should install all packages based off what is inside the packages folder that you installed.
 
-Click new terminal in vscode and enter "nodemon app.js". Using nodemon instead of node allows for server to automatically restart when any change are saved
+Click new terminal in vscode and enter "nodemon app.js". The nodemon command might not work on Mac so please use "npm app.js" instead. Using nodemon instead of node allows for server to automatically restart when any change are saved
 
 Go to browser and enter "localhost:3000/login"
 
