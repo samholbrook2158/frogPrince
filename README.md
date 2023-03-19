@@ -9,7 +9,7 @@ Download node.js: https://nodejs.org/en/download/
 Download xampp: https://www.apachefriends.org/download.html
 start apache server and mysql.
 
-Click admin button next on mysql and go to sql tab and enter the following sql commands. For the users table: "CREATE TABLE users (
+Click admin button next on mysql(Windows) or enter "localhost/phpmyadmin/"(Mac). First click new on the list of databases on the left of the page and do not change any of the settings for set up but just name the database "chat_app". Then inside the DB go to sql tab and enter the following sql commands. For the users table: "CREATE TABLE users (
   id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
