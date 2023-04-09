@@ -1,7 +1,19 @@
 const express = require("express");
+const path = require('path');
 const router = express.Router();
 const mysql = require("mysql");
 const cookieParser = require("cookie-parser");
+const axios = require('axios'); 
+const multer = require('multer');
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, file.originalname);
+  }
+});
+const upload = multer({ storage: storage });
 
 const connection = mysql.createConnection({
   host: "localhost",
@@ -10,7 +22,6 @@ const connection = mysql.createConnection({
   database: "chat_app",
 });
 
-// Middleware to check if the user is authenticated
 function checkAuth(req, res, next) {
   if (!req.cookies.user_id) {
     res.redirect("/login");
@@ -19,7 +30,6 @@ function checkAuth(req, res, next) {
   }
 }
 
-// Display all messages for the authenticated user
 router.get("/messages", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
@@ -29,7 +39,6 @@ router.get("/messages", checkAuth, function (req, res) {
     function (err, friends, fields) {
       if (err) throw err;
 
-      // If there are friends, load messages for the first friend
       if (friends.length > 0) {
         const firstFriendId = friends[0].friend_id;
         res.redirect(`/messages/${firstFriendId}`);
@@ -45,16 +54,25 @@ router.get("/messages", checkAuth, function (req, res) {
   );
 });
 
-
-// Send a message from the authenticated user
-router.post("/messages", checkAuth, function (req, res) {
+router.post("/messages", checkAuth, upload.single('file'), function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.body.friend_id;
   const message = req.body.message;
 
+  const file = req.file;
+  let filePath = null;
+  if (file) {
+    filePath = path.join("uploads", file.filename);
+  }
+
+  if (!message && !file) {
+    res.redirect("/messages/" + friend_id);
+    return;
+  }
+
   connection.query(
-    "INSERT INTO friend_chats (sender_id, receiver_id, message) VALUES (?, ?, ?)",
-    [user_id, friend_id, message],
+    "INSERT INTO friend_chats (sender_id, receiver_id, message, file_path, original_filename) VALUES (?, ?, ?, ?, ?)",
+    [user_id, friend_id, message || null, filePath, file ? file.originalname : null],
     function (err, result) {
       if (err) throw err;
 
@@ -92,6 +110,37 @@ router.get("/messages/:friend_id", checkAuth, function (req, res) {
 });
 
 
+router.get("/download/:message_id", checkAuth, function (req, res) {
+  const message_id = req.params.message_id;
+
+  connection.query(
+    "SELECT * FROM friend_chats WHERE id = ?",
+    [message_id],
+    function (err, results) {
+      if (err) throw err;
+
+      if (results.length > 0) {
+        const file_path = results[0].file_path;
+        const original_filename = results[0].original_filename;
+
+        if (file_path) {
+          res.download(path.join(__dirname, file_path), original_filename, function (err) {
+            if (err) {
+              console.error("Error downloading the file:", err);
+              res.status(500).send("Failed to download the file");
+            }
+          });
+        } else {
+          res.status(404).send("No file found");
+        }
+      } else {
+        res.status(404).send("Message not found");
+      }
+    }
+  );
+});
+
+
 router.get("/api/messages/:friend_id", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.params.friend_id;
@@ -114,7 +163,6 @@ router.post("/signup", function (req, res) {
   const password = req.body.password;
   const organization = req.body.organization || null;
 
-  // Check if the username is already taken
   connection.query(
     "SELECT id FROM users WHERE username = ?",
     [username],
@@ -126,7 +174,6 @@ router.post("/signup", function (req, res) {
       } else if (results.length > 0) {
         res.render("signup", { error: "Username is already taken." });
       } else {
-        // Insert the new user into the database
         connection.query(
           "INSERT INTO users (username, email, password, organization) VALUES (?, ?, ?, ?)",
           [username, email, password, organization],
@@ -147,7 +194,6 @@ router.post("/signup", function (req, res) {
   );
 });
 
-// Display all friends and friend requests for the authenticated user
 router.get("/friends", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
@@ -157,7 +203,6 @@ router.get("/friends", checkAuth, function (req, res) {
     function (err, friends, fields) {
       if (err) throw err;
 
-      // Fetch friend requests
       connection.query(
         "SELECT users.* FROM friendships JOIN users ON friendships.user_id = users.id WHERE friendships.friend_id = ? AND friendships.status = ?",
         [user_id, "pending"],
@@ -169,14 +214,13 @@ router.get("/friends", checkAuth, function (req, res) {
             requests: requests,
             user_id: user_id,
             error: "",
-            searchResults: [], // Add this line to pass an empty array for searchResults
+            searchResults: [], 
           });
         }
       );
     }
   );
 });
-
 
 router.post("/friends/search", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
@@ -188,7 +232,6 @@ router.post("/friends/search", checkAuth, function (req, res) {
     function (err, searchResults, fields) {
       if (err) throw err;
 
-      // Fetch friends and friend requests
       connection.query(
         "SELECT users.* FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
         [user_id, "accepted"],
@@ -215,28 +258,24 @@ router.post("/friends/search", checkAuth, function (req, res) {
   );
 });
 
-// Send a friend request
 router.post("/friends/send-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.body.friend_id;
 
-  // Check if there is an existing friend request between the two users
   connection.query(
     "SELECT * FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
     [user_id, friend_id, friend_id, user_id],
     function (err, results) {
       if (err) throw err;
 
-      // If a request is found, display a message indicating the request is still pending
       if (results.length > 0) {
         res.render("friends", {
           error: "A friend request is already pending.",
           friends: [],
-          requests: [], // Add this line to pass an empty array for requests
-          searchResults: [], // Add this line to pass an empty array for searchResults
+          requests: [], 
+          searchResults: [],
         });
       } else {
-        // If no request is found, create a new friend request
         connection.query(
           "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, ?)",
           [user_id, friend_id, "pending"],
@@ -251,8 +290,6 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
   );
 });
 
-
-// Accept a friend request
 router.post("/friends/accept-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const request_id = req.body.request_id;
@@ -263,7 +300,6 @@ router.post("/friends/accept-request", checkAuth, function (req, res) {
     function (err, result) {
       if (err) throw err;
 
-      // Add this code block to insert a new row with reversed user_id and friend_id values
       connection.query(
         "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, ?)",
         [user_id, request_id, "accepted"],
@@ -277,8 +313,6 @@ router.post("/friends/accept-request", checkAuth, function (req, res) {
   );
 });
 
-
-// Decline a friend request
 router.post("/friends/decline-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const request_id = req.body.request_id;
@@ -294,7 +328,6 @@ router.post("/friends/decline-request", checkAuth, function (req, res) {
   );
 });
 
-// Display the user's account page
 router.get("/account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
@@ -304,11 +337,10 @@ router.get("/account", checkAuth, function (req, res) {
     function (err, rows, fields) {
       if (err) throw err;
 
-      const user = rows[0]; // Get the first (and only) row from the results
+      const user = rows[0]; 
 
       res.render("account", { user: user });
     }
   );
 });
-
 module.exports = router;

@@ -8,6 +8,12 @@
     margin-bottom: 10px;
     position: relative;
   }
+
+  .file-name {
+    color: inherit; /* This will ensure that the file name has the same color as the parent element */
+    text-decoration: none; /* This will remove the underline styling from the file name */
+  }
+  
   
   .message {
     padding: 5px;
@@ -100,18 +106,4 @@
     font-weight: bold;
     cursor: pointer;
   }
-
-  /* New message button styles */
-  .new-message-button {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    background-color: blue;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-  }
+  

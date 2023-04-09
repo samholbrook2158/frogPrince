@@ -117,7 +117,7 @@ app.post('/signup', function (req, res) {
     });
 });
    
-// Mount the Express.js middleware
+// Mounts the Express.js middleware
 app.use("/", ExpressApp);
   
 app.listen(3000, function () {
