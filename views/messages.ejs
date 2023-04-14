@@ -7,27 +7,38 @@
 </head>
 
 <body>
-  <div class="lists-container">
-    <div class="colleague-list">
-      <h2>Colleague List</h2>
-      <ul>
-        <% friends.forEach(function(friend) { %>
-          <li class="friend" data-id="<%= friend.friend_id %>">
-            <a href="/messages/<%= friend.friend_id %>">
-              <%= friend.friend_name %>
-            </a>
-          </li>
-          <% }) %>
-      </ul>
-    </div>
-    <div class="coWorker-list">
-      <h2>Co-workers List</h2>
-      <ul>
-      </ul>
-    </div>
-  </div>
-
   <div class="content-wrapper">
+    <div class="lists-container">
+      <div class="tabs">
+        <button class="tab-button active" id="colleague-tab">Colleagues</button>
+        <button class="tab-button" id="coWorker-tab">Co-workers</button>
+      </div>
+      <div class="lists">
+        <div class="list-wrapper" id="colleague-list">
+          <input type="text" class="search-input" placeholder="Search colleagues" onkeyup="filterList('colleague')" />
+          <div class="list-box">
+            <ul>
+              <% friends.forEach(function(friend) { %>
+                <li class="friend" data-id="<%= friend.friend_id %>">
+                  <a href="/messages/<%= friend.friend_id %>">
+                    <%= friend.friend_name %>
+                  </a>
+                </li>
+                <% }) %>
+            </ul>
+          </div>
+        </div>
+        <div class="list-wrapper hidden" id="coWorker-list">
+          <input type="text" class="search-input" placeholder="Search co-workers" onkeyup="filterList('coWorker')" />
+          <div class="list-box">
+            <ul>
+              <!-- Add your co-workers list items here -->
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="message-container">
       <% if (typeof friend_id !=='undefined' ) { %>
         <% var currentFriend=friends.find(friend=> friend.friend_id == friend_id); %>
@@ -84,7 +95,37 @@
       window.location.href = `/messages/${friendId}`;
     });
   });
+  function filterList(listType) {
+    const input = document.querySelector(`#${listType}-list .search-input`);
+    const filter = input.value.toUpperCase();
+    const ul = document.querySelector(`#${listType}-list ul`);
+    const li = ul.getElementsByTagName("li");
 
+    for (let i = 0; i < li.length; i++) {
+      const a = li[i].getElementsByTagName("a")[0];
+      const txtValue = a.textContent || a.innerText;
+
+      if (txtValue.toUpperCase().indexOf(filter) > -1) {
+        li[i].style.display = "";
+      } else {
+        li[i].style.display = "none";
+      }
+    }
+  }
+
+  document.getElementById('colleague-tab').addEventListener('click', function () {
+    document.getElementById('colleague-tab').classList.add('active');
+    document.getElementById('coWorker-tab').classList.remove('active');
+    document.getElementById('colleague-list').classList.remove('hidden');
+    document.getElementById('coWorker-list').classList.add('hidden');
+  });
+
+  document.getElementById('coWorker-tab').addEventListener('click', function () {
+    document.getElementById('coWorker-tab').classList.add('active');
+    document.getElementById('colleague-tab').classList.remove('active');
+    document.getElementById('coWorker-list').classList.remove('hidden');
+    document.getElementById('colleague-list').classList.add('hidden');
+  });
   async function loadMessages(friendId) {
     const response = await fetch(`/api/messages/${friendId}`);
     const messages = await response.json();

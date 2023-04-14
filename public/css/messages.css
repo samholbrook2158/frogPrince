@@ -1,5 +1,6 @@
 .message-container {
-  height: 70vh;
+  height: 90vh;
+  width: 110vh;
   overflow-y: scroll;
   padding: 10px;
   background-color: #f9f9f9;
@@ -9,23 +10,71 @@
   position: relative;
 }
 
-.lists-container {
+.list-box {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  max-height: 300px; /* Adjust the height based on your requirements */
+  overflow-y: auto;
+}
+
+.search-input {
+  width: auto;
+  padding: 8px;
+  margin-bottom: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.content-wrapper {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  width: 60%;
+}
+
+.lists-container {
+  width: auto;
+  display: flex;
+  flex-direction: column;
+  margin-right: 10px;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
   margin-bottom: 10px;
 }
 
-.colleague-list a,
-.coWorker-list a {
-  text-decoration: none; 
-  color: #333;
+.tab-button {
+  flex: 1;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
 }
 
+.tab-button.active {
+  background-color: white;
+}
 
-.colleague-list li,
-.coWorker-list li {
+.lists {
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 0 0 5px 5px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.list-wrapper ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.list-wrapper li {
   margin-bottom: 5px;
   padding: 2px;
   background-color: #ffffff;
@@ -36,75 +85,31 @@
   width: auto;
 }
 
-.colleague-list li:hover,
-.coWorker-list li:hover {
+.list-wrapper li:hover {
   background-color: #f0f0f0;
   border-color: #999;
 }
-.colleague-list,
-.coWorker-list {
-  flex: 1;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  max-height: 15vh;
-  overflow-y: auto;
+
+.list-wrapper a {
+  text-decoration: none;
+  color: #333;
+  display: block;
+  padding: 0 5px;
 }
 
-.colleague-list,
-.coWorker-list {
-  margin-right: 5px;
-}
-
-.colleague-list ul,
-.coWorker-list ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.colleague-list li,
-.coWorker-list li {
-  margin-bottom: 5px;
-}
-
-.colleague-list h2,
-.coWorker-list h2 {
-  margin-top: 0;
-}
-
-.colleague-list ul li:first-child,
-.coWorker-list ul li:first-child {
-  margin-top: 0;
-}
-
-.colleague-list a:hover,
-.coWorker-list a:hover {
+.list-wrapper a:hover {
   background-color: #f0f0f0;
   border-color: #999;
   text-decoration: underline;
 }
 
-.content-wrapper {
-  display: flex;
-  flex-direction: row;
+.hidden {
+  display: none;
 }
 
-.message-container {
-  height: 30vh;
-  width: 60%;
-  overflow-y: scroll;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  position: relative;
-}
 
 .data-container {
-  width: 40%;
+  width: auto;
 }
 
 .file-name {
@@ -150,17 +155,6 @@
 
 .message.received .message-timestamp {
   text-align: left;
-}
-
-.message-container {
-  height: 70vh;
-  overflow-y: scroll;
-  padding: 10px;
-  background-color: #f9f9f9;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  position: relative;
 }
 
 .message {
