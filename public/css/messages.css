@@ -1,109 +1,205 @@
 .message-container {
-    height: 70vh;
-    overflow-y: scroll;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    position: relative;
-  }
+  height: 70vh;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  position: relative;
+}
 
-  .file-name {
-    color: inherit; /* This will ensure that the file name has the same color as the parent element */
-    text-decoration: none; /* This will remove the underline styling from the file name */
-  }
-  
-  
-  .message {
-    padding: 5px;
-    margin-bottom: 10px;
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .message.sent {
-    align-items: flex-end;
-  }
-  
-  .message-content {
-    display: inline-block;
-    padding: 10px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    max-width: 60%;
-    word-wrap: break-word;
-  }
-  
-  .message.received .message-content {
-    background-color: #e6e6e6;
-  }
-  
-  .message-timestamp {
-    font-size: 12px;
-    color: #999;
-    margin-top: 2px;
-  }
-  
-  .message.sent .message-timestamp {
-    text-align: right;
-  }
-  
-  .message.received .message-timestamp {
-    text-align: left;
-  }
-  
+.lists-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 60%;
+  margin-bottom: 10px;
+}
+
+.colleague-list a,
+.coWorker-list a {
+  text-decoration: none; 
+  color: #333;
+}
+
+
+.colleague-list li,
+.coWorker-list li {
+  margin-bottom: 5px;
+  padding: 2px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: left;
+  transition: background-color 0.3s, border-color 0.3s;
+  width: auto;
+}
+
+.colleague-list li:hover,
+.coWorker-list li:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+}
+.colleague-list,
+.coWorker-list {
+  flex: 1;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-height: 15vh;
+  overflow-y: auto;
+}
+
+.colleague-list,
+.coWorker-list {
+  margin-right: 5px;
+}
+
+.colleague-list ul,
+.coWorker-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.colleague-list li,
+.coWorker-list li {
+  margin-bottom: 5px;
+}
+
+.colleague-list h2,
+.coWorker-list h2 {
+  margin-top: 0;
+}
+
+.colleague-list ul li:first-child,
+.coWorker-list ul li:first-child {
+  margin-top: 0;
+}
+
+.colleague-list a:hover,
+.coWorker-list a:hover {
+  background-color: #f0f0f0;
+  border-color: #999;
+  text-decoration: underline;
+}
+
+.content-wrapper {
+  display: flex;
+  flex-direction: row;
+}
+
 .message-container {
-    height: 70vh;
-    overflow-y: scroll;
-    padding: 10px;
-    background-color: #f9f9f9;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    position: relative;
-  }
+  height: 30vh;
+  width: 60%;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  position: relative;
+}
 
-  .message {
-    padding: 10px;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-bottom: 10px;
-  }
+.data-container {
+  width: 40%;
+}
 
-  .message.sent {
-    text-align: right;
-  }
+.file-name {
+  color: inherit;
+  text-decoration: none;
+}
 
-  .message.received {
-    text-align: left;
-  }
+.message {
+  padding: 5px;
+  margin-bottom: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
 
-  .message-input-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    margin-top: 10px;
-  }
+.message.sent {
+  align-items: flex-end;
+}
 
-  .message-input {
-    flex: 1;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    margin-right: 10px;
-  }
+.message-content {
+  display: inline-block;
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  max-width: 60%;
+  word-wrap: break-word;
+}
 
-  .send-button {
-    padding: 10px 20px;
-    border-radius: 5px;
-    border: none;
-    background-color: blue;
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  
+.message.received .message-content {
+  background-color: #e6e6e6;
+}
+
+.message-timestamp {
+  font-size: 12px;
+  color: #999;
+  margin-top: 2px;
+}
+
+.message.sent .message-timestamp {
+  text-align: right;
+}
+
+.message.received .message-timestamp {
+  text-align: left;
+}
+
+.message-container {
+  height: 70vh;
+  overflow-y: scroll;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.message {
+  padding: 10px;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.message.sent {
+  text-align: right;
+}
+
+.message.received {
+  text-align: left;
+}
+
+.message-input-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.message-input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  margin-right: 10px;
+}
+
+.send-button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  border: none;
+  background-color: blue;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+}
