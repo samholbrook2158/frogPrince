@@ -3,13 +3,13 @@ const path = require('path');
 const router = express.Router();
 const mysql = require("mysql");
 const cookieParser = require("cookie-parser");
-const axios = require('axios'); 
+const axios = require('axios');
 const multer = require('multer');
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, 'uploads/');
   },
-  filename: function(req, file, cb) {
+  filename: function (req, file, cb) {
     cb(null, file.originalname);
   }
 });
@@ -176,7 +176,7 @@ router.get("/friends", checkAuth, function (req, res) {
             requests: requests,
             user_id: user_id,
             error: "",
-            searchResults: [], 
+            searchResults: [],
           });
         }
       );
@@ -234,7 +234,7 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
         res.render("friends", {
           error: "A friend request is already pending.",
           friends: [],
-          requests: [], 
+          requests: [],
           searchResults: [],
         });
       } else {
@@ -299,7 +299,7 @@ router.get("/account", checkAuth, function (req, res) {
     function (err, rows, fields) {
       if (err) throw err;
 
-      const user = rows[0]; 
+      const user = rows[0];
 
       res.render("account", { user: user });
     }
@@ -310,34 +310,24 @@ router.get("/account", checkAuth, function (req, res) {
 router.post("/delete-account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
+  // Delete friendships
   connection.query(
-    "SELECT * FROM friendships WHERE user_id = ? OR friend_id = ?",
+    "DELETE FROM friendships WHERE user_id = ? OR friend_id = ?",
     [user_id, user_id],
-    function (err, rows, fields) {
+    function (err, result) {
       if (err) throw err;
 
-      // Remove any friendships involving the user
-      for (let i = 0; i < rows.length; i++) {
-        const friendship = rows[i];
-
-        connection.query(
-          "DELETE FROM friendships WHERE id = ?",
-          [friendship.id],
-          function (err, result) {
-            if (err) throw err;
-          }
-        );
-      }
-
-      // Delete the user's account
+      // Delete user
       connection.query(
         "DELETE FROM users WHERE id = ?",
         [user_id],
         function (err, result) {
           if (err) throw err;
 
-          // Clear the user_id cookie and redirect to the login page
+          // Clear user_id cookie
           res.clearCookie("user_id");
+
+          // Redirect to login page
           res.redirect("/login");
         }
       );
