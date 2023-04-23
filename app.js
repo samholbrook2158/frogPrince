@@ -39,8 +39,7 @@ app.use(cookieParser());
 app.get('/logout', function(req, res) {
     res.clearCookie('user_id');
     res.redirect('/login');
-  });
-  
+});
 
 app.get("/login", function (req, res) {
     res.render("login");
@@ -61,7 +60,7 @@ app.post("/login", function (req, res) {
             } else if (results.length > 0) {
                 var user_id = results[0].id;
                 res.cookie("user_id", user_id);
-                res.render("dashboard", { username: username });
+                res.redirect("/dashboard"); // Redirect to the dashboard route
             } else {
                 db.query(
                     "SELECT id FROM users WHERE username = ?",
@@ -82,7 +81,6 @@ app.post("/login", function (req, res) {
         }
     );
 });
-
 
 // Display the signup page
 app.get("/signup", function (req, res) {
@@ -124,12 +122,28 @@ app.post('/signup', function (req, res) {
     });
 });
 
-   
+app.get("/dashboard", function (req, res) {
+    var user_id = req.cookies.user_id;
+
+    if (!user_id) {
+        return res.redirect("/login");
+    }
+
+    db.query("SELECT username FROM users WHERE id = ?", [user_id], function (err, results) {
+        if (err || results.length === 0) {
+            res.redirect("/login");
+        } else {
+            var username = results[0].username;
+            res.render("dashboard", { username: username });
+        }
+    });
+});
+
 // Mounts the Express.js middleware
 app.use("/", ExpressApp);
-  
+
 app.listen(3000, function () {
-console.log("Server listening on port 3000");
+    console.log("Server listening on port 3000");
 });
-  
-module.exports = app;  
+
+module.exports = app;

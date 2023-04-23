@@ -30,6 +30,14 @@ function checkAuth(req, res, next) {
   }
 }
 
+router.get("/about", function (req, res) {
+  res.render("about");
+});
+
+router.get("/FAQ", function (req, res) {
+  res.render("FAQ");
+});
+
 router.get("/messages", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
