@@ -335,4 +335,21 @@ router.post("/delete-account", checkAuth, function (req, res) {
   );
 });
 
+router.post("/edit-account", checkAuth, function (req, res) {
+  const user_id = req.cookies.user_id;
+  const { username, email, organization, role } = req.body;
+
+  connection.query(
+    "UPDATE users SET username = ?, email = ?, organization = ?, role = ? WHERE id = ?",
+    [username, email, organization, role, user_id],
+    function (err, result) {
+      if (err) throw err;
+
+      // Redirect back to account page
+      res.redirect("/account");
+    }
+  );
+});
+
+
 module.exports = router;

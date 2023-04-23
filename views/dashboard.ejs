@@ -1,39 +1,111 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Dashboard</title>
-    <link rel="stylesheet" href="css/dashboard.css" />
-  </head>
-  <body>
-    <!-- Navigation bar -->
-    <nav class="nav-bar">
-      <!-- Logout and Friends buttons -->
-      <div class="dropdown">
-        <div class="dropdown-content">
-          <a href="/account" class="nav-button">Account</a>
-          <a href="/logout" class="nav-button">Sign out</a>
-          <a href="/friends" class="nav-button">Friends</a>
-        </div>
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="css/dashboard.css" />
+</head>
+
+<body>
+  <!-- Navigation bar -->
+  <nav class="nav-bar">
+    <div class="dropdown">
+      <div class="dropdown-content">
+        <a href="/account" class="nav-button">Account</a>
+        <a href="/friends" class="nav-button">Friends</a>
+        <a href="/logout" class="nav-button">Sign out</a>
       </div>
-    </nav>
+    </div>
+  </nav>
 
-    <!-- Main content -->
-    <main>
-      <h1>frogPrince Dashboard, hi <%= username %>!</h1>
-      <p>Here you can access your messages.</p>
-      <a href="/messages" class="message-button">Go to Messages</a>
-      <p>Here you can manage your friends.</p>
-      <a href="/friends" class="message-button">Go to Friends</a>
-    </main>
+  <!-- Main content -->
+  <main>
+    <h1 class="welcome-message">frogPrince Dashboard</h1>
+    <div class="renewal-sections">
+      <div class="renewal-container">
+        <h2>Ongoing renewals</h2>
+        <div class="renewal-box"></div>
+      </div>
+      <div class="renewal-container">
+        <h2>Upcoming renewals</h2>
+        <div class="renewal-box"></div>
+      </div>
+      <div class="renewal-container">
+        <h2>Finished renewals</h2>
+        <div class="renewal-box"></div>
+      </div>
+    </div>
+    <section class="activity-section">
+      <h2>Activity</h2>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th>Activity name</th>
+              <th>Details</th>
+              <th>Start date</th>
+              <th>Status</th>
+              <th>Link</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Activity 1</td>
+              <td>Activity 1 details</td>
+              <td>2023-04-01</td>
+              <td>In progress</td>
+              <td><a href="#">Link 1</a></td>
+            </tr>
+            <tr>
+              <td>Activity 2</td>
+              <td>Activity 2 details</td>
+              <td>2023-04-15</td>
+              <td>Completed</td>
+              <td><a href="#">Link 2</a></td>
+            </tr>
+            <tr>
+              <td>Activity 3</td>
+              <td>Activity 3 details</td>
+              <td>2023-04-20</td>
+              <td>In progress</td>
+              <td><a href="#">Link 3</a></td>
+            </tr>
+            <tr>
+              <td>Activity 1</td>
+              <td>Activity 1 details</td>
+              <td>2023-04-01</td>
+              <td>In progress</td>
+              <td><a href="#">Link 1</a></td>
+            </tr>
+            <tr>
+              <td>Activity 2</td>
+              <td>Activity 2 details</td>
+              <td>2023-04-15</td>
+              <td>Completed</td>
+              <td><a href="#">Link 2</a></td>
+            </tr>
+            <tr>
+              <td>Activity 3</td>
+              <td>Activity 3 details</td>
+              <td>2023-04-20</td>
+              <td>In progress</td>
+              <td><a href="#">Link 3</a></td>
+            </tr>
+          </tbody>          
+        </table>
+      </div>
+    </section>
+  </main>
 
-    <script>
-      function toggleMenu() {
-        const dropdown = document.querySelector(".dropdown");
-        const hamburger = document.querySelector(".hamburger");
-        dropdown.classList.toggle("active");
-        hamburger.classList.toggle("active");
-      }
-    </script>
-  </body>
+  <script>
+    function toggleMenu() {
+      const dropdown = document.querySelector(".dropdown");
+      const hamburger = document.querySelector(".hamburger");
+      dropdown.classList.toggle("active");
+      hamburger.classList.toggle("active");
+    }
+  </script>
+</body>
+
 </html>

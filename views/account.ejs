@@ -1,17 +1,88 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Account</title>
-</head>
-<body>
-    <h1>Account Details</h1>
-    <p>Username: <%= user.username %></p>
-    <p>Email: <%= user.Email %></p>
-    <p>Organization: <%= user.organization %></p>
-    <p>Role: <%= user.role %></p>
 
-    <form method="POST" action="/delete-account" onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
-      <button type="submit">Delete Account</button>
-    </form>
+<head>
+  <title>Account</title>
+  <link rel="stylesheet" href="/css/account.css">
+</head>
+
+<body>
+  <!-- Navigation bar -->
+  <nav class="nav-bar">
+    <div class="dropdown">
+      <div class="dropdown-content">
+        <a href="/login" class="nav-button">Home</a>
+        <a href="/friends" class="nav-button">Friends</a>
+        <a href="/logout" class="nav-button">Sign out</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <h1 class="welcome-message">Account Details</h1>
+    <div class="account-detail">
+      <% if (editing) { %>
+        <form method="POST" action="/edit-account">
+          <!-- Account details -->
+          <div class="account-detail">
+            <p><strong>Username:</strong>
+              <%= user.username %>
+            </p>
+          </div>
+
+          <div class="account-detail">
+            <p><strong>Email:</strong>
+              <%= user.Email %>
+            </p>
+          </div>
+
+          <div class="account-detail">
+            <p><strong>Organization:</strong>
+              <%= user.organization %>
+            </p>
+          </div>
+
+          <div class="account-detail">
+            <p><strong>Role:</strong>
+              <%= user.role %>
+            </p>
+          </div>
+
+
+            <button type="submit" class="btn btn-success btn-rectangle">Save Changes</button>
+            <button type="button" onclick="location.href='/account'"
+              class="btn btn-danger btn-rectangle">Cancel</button>
+          </form>
+
+          <% } else { %>
+            <p>Username: <%= user.username %>
+            </p>
+            <p>Email: <%= user.Email %>
+            </p>
+            <p>Organization: <%= user.organization %>
+            </p>
+            <p>Role: <%= user.role %>
+            </p>
+            <button type="button" onclick="location.href='/account?editing=true'"
+              class="edit-account-button btn-rectangle">Edit Account</button>
+            <form method="POST" action="/delete-account"
+              onsubmit="return confirm('Are you sure you want to delete your account? This action cannot be undone.')">
+              <button type="submit" class="btn btn-danger btn-rectangle">Delete Account</button>
+            </form>
+            <% } %>
+    </div>
+  </main>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    // toggle dropdown menu
+    $(document).ready(function () {
+      $(".dropdown").click(function () {
+        $(this).toggleClass("active");
+      });
+    });
+  </script>
 </body>
+
 </html>
