@@ -57,18 +57,21 @@
   padding: 0;
 }
 
-/* Logout button styles */
 .nav-button {
   padding: 10px;
   color: #fff;
   text-decoration: none;
   transition: all 0.3s ease;
   margin-top: 10px;
+  line-height: 50px;
 }
 
+
 .nav-button:hover {
-  background-color: #333;
+  background-color: #333333;
+  padding: 0 30px;
 }
+
 h1 {
   margin-bottom: 30px;
   font-family: Arial, sans-serif;
@@ -118,7 +121,7 @@ a:hover {
   border: 1px solid #ccc;
   border-radius: 5px;
   padding: 10px;
-  max-height: 300px; /* Adjust the height based on your requirements */
+  max-height: 300px; 
   overflow-y: auto;
 }
 

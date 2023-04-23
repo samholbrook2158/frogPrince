@@ -120,15 +120,17 @@ a:hover {
     padding: 0;
 }
 
-/* Logout button styles */
 .nav-button {
     padding: 10px;
     color: #fff;
     text-decoration: none;
     transition: all 0.3s ease;
     margin-top: 10px;
-}
-
-.nav-button:hover {
-    background-color: #333;
-}
+    line-height: 50px;
+  }
+  
+  
+  .nav-button:hover {
+    background-color: #333333;
+    padding: 0 30px;
+  }

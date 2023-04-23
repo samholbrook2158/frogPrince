@@ -360,5 +360,8 @@ router.post("/edit-account", checkAuth, function (req, res) {
   );
 });
 
+router.get("/renewal", function (req, res) {
+  res.render("renewal");
+});
 
 module.exports = router;
