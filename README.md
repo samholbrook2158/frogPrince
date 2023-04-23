@@ -9,40 +9,10 @@ Download node.js: https://nodejs.org/en/download/
 Download xampp: https://www.apachefriends.org/download.html
 start apache server and mysql.
 
-Click admin button next on mysql(Windows) or enter "localhost/phpmyadmin/"(Mac). First click new on the list of databases on the left of the page and do not change any of the settings for set up but just name the database "chat_app". 
-Create a new database by clicking on the "New" button on the left-hand side and giving it a name.
-Select the new database from the left-hand sidebar and click on the "Import" tab at the top.
-Click on the "Choose File" button and select the SQL dump file you provided.
-Click on the "Go" button at the bottom to import the database.Then inside the DB go to sql tab and enter the following sql commands. 
+Find your xampp directory on Windows this will usually be "C:\xampp" if you left it as the default instaltion settings. On Mac you can find the xampp folder in your Applications folder. From here go to the "htdocs" folder and place this reposiotry folder inside. This is important if you want to run the web platform locally on your device. 
 
-For the users table: "CREATE TABLE users (
-  id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  username VARCHAR(255) NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  Email VARCHAR(255),
-  organization VARCHAR(255),
-  role VARCHAR(255)
-);"
-
-For the friend list table: "CREATE TABLE `friendships` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_id` int(11) NOT NULL,
-  `friend_id` int(11) NOT NULL,
-  `status` ENUM('pending', 'accepted', 'declined') NOT NULL,
-  PRIMARY KEY (`id`),
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (friend_id) REFERENCES users(id)
-);"
-
-For the chatting with friends table: "CREATE TABLE messages (
-  id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  sender_id INT(11) NOT NULL,
-  receiver_id INT(11) NOT NULL,
-  message VARCHAR(255),
-  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  original_filename VARCHAR(255),
-  file_path VARCHAR(255)
-);"
+Open the xampp application and start the spache server and mysql server, click 'admin' button next on mysql(Windows) or enter "localhost/phpmyadmin/"(Mac). First click new on the list of databases on the left of the page and do not change any of the settings for set up but just name the database "chat_app". 
+After creating find the import tab near the top of the page. From here you will need to select the file and find the "chat_app.sql" file which will be stored in the MySQL chat_app" folder in this repository. Leave all other settings alone and click import at the bottom.
 
 Inside terminal with project open enter "npm install". This should install all packages based off what is inside the packages folder that you installed.
 
