@@ -20,14 +20,8 @@ For the users table: "CREATE TABLE users (
   username VARCHAR(255) NOT NULL,
   password VARCHAR(255) NOT NULL,
   Email VARCHAR(255),
-  organization VARCHAR(255)
-);"
-
-For the messages table: "CREATE TABLE messages (
-  id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
-  message VARCHAR(255) NOT NULL,
-  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  user_id INT(11)
+  organization VARCHAR(255),
+  role VARCHAR(255)
 );"
 
 For the friend list table: "CREATE TABLE `friendships` (
@@ -40,14 +34,15 @@ For the friend list table: "CREATE TABLE `friendships` (
   FOREIGN KEY (friend_id) REFERENCES users(id)
 );"
 
-For the chatting with friends table: "CREATE TABLE friend_chats (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  sender_id INT NOT NULL,
-  receiver_id INT NOT NULL,
-  message TEXT NOT NULL,
-  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+For the chatting with friends table: "CREATE TABLE messages (
+  id INT(11) NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  sender_id INT(11) NOT NULL,
+  receiver_id INT(11) NOT NULL,
+  message VARCHAR(255),
+  timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  original_filename VARCHAR(255),
+  file_path VARCHAR(255)
 );"
-
 
 Inside terminal with project open enter "npm install". This should install all packages based off what is inside the packages folder that you installed.
 
