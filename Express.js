@@ -292,6 +292,7 @@ router.post("/friends/decline-request", checkAuth, function (req, res) {
 
 router.get("/account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
+  const editing = req.query.editing === 'true';
 
   connection.query(
     "SELECT * FROM users WHERE id = ?",
@@ -301,7 +302,7 @@ router.get("/account", checkAuth, function (req, res) {
 
       const user = rows[0];
 
-      res.render("account", { user: user });
+      res.render("account", { user: user, editing: editing });
     }
   );
 });
