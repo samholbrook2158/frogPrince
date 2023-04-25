@@ -148,7 +148,7 @@ a:hover {
 .renewal-sections {
   display: flex;
   justify-content: space-between;
-  width: 100%;
+  width: 80%;
   margin-bottom: 30px;
 }
 

@@ -42,13 +42,19 @@ router.get("/messages", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
   connection.query(
-    "SELECT users.id as friend_id, users.username as friend_name FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+    "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
     [user_id, "accepted"],
     function (err, friends, fields) {
       if (err) throw err;
 
-      if (friends.length > 0) {
-        const firstFriendId = friends[0].friend_id;
+      const colleagueFriends = friends.filter(friend => friend.is_colleague === 1);
+      const clientFriends = friends.filter(friend => friend.is_colleague !== 1);
+
+      if (colleagueFriends.length > 0) {
+        const firstFriendId = colleagueFriends[0].friend_id;
+        res.redirect(`/messages/${firstFriendId}`);
+      } else if (clientFriends.length > 0) {
+        const firstFriendId = clientFriends[0].friend_id;
         res.redirect(`/messages/${firstFriendId}`);
       } else {
         res.render("messages", {
@@ -61,6 +67,7 @@ router.get("/messages", checkAuth, function (req, res) {
     }
   );
 });
+
 
 router.post("/messages", checkAuth, upload.single('file'), function (req, res) {
   const user_id = req.cookies.user_id;
@@ -164,11 +171,27 @@ router.get("/api/messages/:friend_id", checkAuth, function (req, res) {
   );
 });
 
+router.get("/api/messages/:friend_id/since/:last_message_id", checkAuth, function (req, res) {
+  const user_id = req.cookies.user_id;
+  const friend_id = req.params.friend_id;
+  const last_message_id = req.params.last_message_id;
+
+  connection.query(
+    "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) AND friend_chats.id > ? ORDER BY timestamp ASC",
+    [user_id, friend_id, friend_id, user_id, last_message_id],
+    function (err, messages, fields) {
+      if (err) throw err;
+
+      res.json(messages);
+    }
+  );
+});
+
 router.get("/friends", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
   connection.query(
-    "SELECT users.* FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+    "SELECT users.*, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
     [user_id, "accepted"],
     function (err, friends, fields) {
       if (err) throw err;
@@ -203,7 +226,7 @@ router.post("/friends/search", checkAuth, function (req, res) {
       if (err) throw err;
 
       connection.query(
-        "SELECT users.* FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+        "SELECT users.*, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
         [user_id, "accepted"],
         function (err, friends, fields) {
           if (err) throw err;
@@ -247,12 +270,22 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
         });
       } else {
         connection.query(
-          "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, ?)",
-          [user_id, friend_id, "pending"],
-          function (err, result) {
+          "SELECT organization FROM users WHERE id IN (?, ?)",
+          [user_id, friend_id],
+          function (err, organizations, fields) {
             if (err) throw err;
 
-            res.redirect("/friends");
+            const is_colleague = organizations[0].organization === organizations[1].organization ? 1 : 0;
+
+            connection.query(
+              "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
+              [user_id, friend_id, "pending", is_colleague],
+              function (err, result) {
+                if (err) throw err;
+
+                res.redirect("/friends");
+              }
+            );
           }
         );
       }
@@ -265,18 +298,27 @@ router.post("/friends/accept-request", checkAuth, function (req, res) {
   const request_id = req.body.request_id;
 
   connection.query(
-    "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
-    ["accepted", request_id, user_id],
+    "SELECT is_colleague FROM friendships WHERE user_id = ? AND friend_id = ?",
+    [request_id, user_id],
     function (err, result) {
       if (err) throw err;
+      const is_colleague = result[0].is_colleague;
 
       connection.query(
-        "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, ?)",
-        [user_id, request_id, "accepted"],
+        "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
+        ["accepted", request_id, user_id],
         function (err, result) {
           if (err) throw err;
 
-          res.redirect("/friends");
+          connection.query(
+            "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
+            [user_id, request_id, "accepted", is_colleague],
+            function (err, result) {
+              if (err) throw err;
+
+              res.redirect("/friends");
+            }
+          );
         }
       );
     }

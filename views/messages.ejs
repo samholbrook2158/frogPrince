@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages</title>
   <link rel="stylesheet" href="/css/messages.css" />
+  <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
@@ -28,151 +29,159 @@
     <div class="lists-container">
       <div class="tabs">
         <button class="tab-button active" id="colleague-tab">Colleagues</button>
-        <button class="tab-button" id="coWorker-tab">Co-workers</button>
+        <button class="tab-button" id="coWorker-tab">Clients</button>
       </div>
       <div class="lists">
         <div class="list-wrapper" id="colleague-list">
           <input type="text" class="search-input" placeholder="Search colleagues" onkeyup="filterList('colleague')" />
           <div class="list-box">
             <ul>
-              <% friends.forEach(function(friend) { %>
+              <% friends.filter(friend=> friend.is_colleague).forEach(function(friend) { %>
                 <li class="friend" data-id="<%= friend.friend_id %>">
                   <a href="/messages/<%= friend.friend_id %>">
                     <%= friend.friend_name %>
                   </a>
                 </li>
-                <% }) %>
+              <% }) %>
             </ul>
           </div>
         </div>
         <div class="list-wrapper hidden" id="coWorker-list">
-          <input type="text" class="search-input" placeholder="Search co-workers" onkeyup="filterList('coWorker')" />
+          <input type="text" class="search-input" placeholder="Search clients" onkeyup="filterList('coWorker')" />
           <div class="list-box">
             <ul>
-              <!-- Add your co-workers list items here -->
+              <% friends.filter(friend=> !friend.is_colleague).forEach(function(friend) { %>
+                <li class="friend" data-id="<%= friend.friend_id %>">
+                  <a href="/messages/<%= friend.friend_id %>">
+                    <%= friend.friend_name %>
+                  </a>
+                </li>
+              <% }) %>
             </ul>
           </div>
         </div>
-      </div>
+      </div>      
     </div>
 
     <div class="message-container">
       <% if (typeof friend_id !=='undefined' ) { %>
         <% var currentFriend=friends.find(friend=> friend.friend_id == friend_id); %>
-          <h3>You are chatting with: <%= currentFriend.friend_name %>
-          </h3>
-          <% } %>
-            <% for (var i=0; i < messages.length; i++) { %>
-              <% var message=messages[i]; %>
-                <div class="message <%= message.sender_id == user_id ? 'sent' : 'received' %>">
-                  <div class="message-content">
-                    <% if (message.message) { %>
-                      <p>
-                        <%= message.message %>
-                      </p>
-                      <% } %>
-                        <% if (message.file_path) { %>
-                          <p>
-                            Download: <a href="/download/<%= message.id %>" target="_blank">
-                              <span class="file-name">
-                                <%= message.original_filename %>
-                              </span>
-                            </a>
-                          </p>
-                          <% } %>
-                  </div>
-                  <div class="message-timestamp">
-                    <p>
-                      <%= message.timestamp.toLocaleString() %>
-                    </p>
-                  </div>
-                </div>
+          <% if (currentFriend) { %>
+            <h3>You are chatting with: <%= currentFriend.friend_name %>
+            </h3>
+            <% } else { %>
+              <h3>Friend not found.</h3>
+              <% } %>
                 <% } %>
-
-                  <% if (typeof friend_id !=='undefined' ) { %>
-                    <form method="POST" action="/messages" enctype="multipart/form-data" novalidate>
-                      <input type="hidden" name="friend_id" value="<%= friend_id %>" />
-                      <div class="message-input-container">
-                        <input type="text" name="message" class="message-input" required />
-                        <input type="file" name="file" />
-                        <button type="submit" class="send-button">Send</button>
+                  <% for (var i=0; i < messages.length; i++) { %>
+                    <% var message=messages[i]; %>
+                      <div class="message <%= message.sender_id == user_id ? 'sent' : 'received' %>">
+                        <div class="message-content">
+                          <% if (message.message) { %>
+                            <p>
+                              <%= message.message %>
+                            </p>
+                            <% } %>
+                              <% if (message.file_path) { %>
+                                <p>
+                                  Download: <a href="/download/<%= message.id %>" target="_blank">
+                                    <span class="file-name">
+                                      <%= message.original_filename %>
+                                    </span>
+                                  </a>
+                                </p>
+                                <% } %>
+                        </div>
+                        <div class="message-timestamp">
+                          <p>
+                            <%= message.timestamp.toLocaleString() %>
+                          </p>
+                        </div>
                       </div>
-                    </form>
-                    <% } %>
+                      <% } %>
+
+                        <% if (typeof friend_id !=='undefined' ) { %>
+                          <form method="POST" action="/messages" enctype="multipart/form-data" novalidate>
+                            <input type="hidden" name="friend_id" value="<%= friend_id %>" />
+                            <div class="message-input-container">
+                              <input type="text" name="message" class="message-input" required />
+                              <input type="file" name="file" />
+                              <button type="submit" class="send-button">Send</button>
+                            </div>
+                          </form>
+                          <% } %>
     </div>
     <div class="data-container">
       <!-- Your data container content goes here -->
     </div>
   </div>
-</body>
-<script>
-  document.querySelectorAll(".friend").forEach((friendListItem) => {
-    friendListItem.addEventListener("click", (event) => {
-      const friendId = event.currentTarget.getAttribute("data-id");
-      window.location.href = `/messages/${friendId}`;
+  <script>document.querySelectorAll(".friend").forEach((friendListItem) => {
+      friendListItem.addEventListener("click", (event) => {
+        const friendId = event.currentTarget.getAttribute("data-id");
+        window.location.href = `/messages/${friendId}`;
+      });
     });
-  });
-  function filterList(listType) {
-    const input = document.querySelector(`#${listType}-list .search-input`);
-    const filter = input.value.toUpperCase();
-    const ul = document.querySelector(`#${listType}-list ul`);
-    const li = ul.getElementsByTagName("li");
+    function filterList(listType) {
+      const input = document.querySelector(`#${listType}-list .search-input`);
+      const filter = input.value.toUpperCase();
+      const ul = document.querySelector(`#${listType}-list ul`);
+      const li = ul.getElementsByTagName("li");
 
-    for (let i = 0; i < li.length; i++) {
-      const a = li[i].getElementsByTagName("a")[0];
-      const txtValue = a.textContent || a.innerText;
+      for (let i = 0; i < li.length; i++) {
+        const a = li[i].getElementsByTagName("a")[0];
+        const txtValue = a.textContent || a.innerText;
 
-      if (txtValue.toUpperCase().indexOf(filter) > -1) {
-        li[i].style.display = "";
-      } else {
-        li[i].style.display = "none";
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+          li[i].style.display = "";
+        } else {
+          li[i].style.display = "none";
+        }
       }
     }
-  }
 
-  document.getElementById('colleague-tab').addEventListener('click', function () {
-    document.getElementById('colleague-tab').classList.add('active');
-    document.getElementById('coWorker-tab').classList.remove('active');
-    document.getElementById('colleague-list').classList.remove('hidden');
-    document.getElementById('coWorker-list').classList.add('hidden');
-  });
-
-  document.getElementById('coWorker-tab').addEventListener('click', function () {
-    document.getElementById('coWorker-tab').classList.add('active');
-    document.getElementById('colleague-tab').classList.remove('active');
-    document.getElementById('coWorker-list').classList.remove('hidden');
-    document.getElementById('colleague-list').classList.add('hidden');
-  });
-  async function loadMessages(friendId) {
-    const response = await fetch(`/api/messages/${friendId}`);
-    const messages = await response.json();
-    const messageContainer = document.querySelector(".message-container");
-    messageContainer.innerHTML = "";
-
-    messages.forEach((message) => {
-      const messageDiv = document.createElement("div");
-      messageDiv.className = `message ${message.sender_id == user_id ? "sent" : "received"
-        }`;
-
-      const senderP = document.createElement("p");
-      senderP.textContent =
-        message.sender_id == user_id ? "You" : message.sender;
-      messageDiv.appendChild(senderP);
-
-      const messageP = document.createElement("p");
-      messageP.textContent = message.message;
-      messageDiv.appendChild(messageP);
-
-      const timestampP = document.createElement("p");
-      timestampP.textContent = new Date(message.timestamp).toLocaleString();
-      messageDiv.appendChild(timestampP);
-
-      messageContainer.appendChild(messageDiv);
+    document.getElementById('colleague-tab').addEventListener('click', function () {
+      document.getElementById('colleague-tab').classList.add('active');
+      document.getElementById('coWorker-tab').classList.remove('active');
+      document.getElementById('colleague-list').classList.remove('hidden');
+      document.getElementById('coWorker-list').classList.add('hidden');
     });
 
-    const messageForm = document.querySelector("form");
-    if (!messageForm) {
-      const formHtml = `
+    document.getElementById('coWorker-tab').addEventListener('click', function () {
+      document.getElementById('coWorker-tab').classList.add('active');
+      document.getElementById('colleague-tab').classList.remove('active');
+      document.getElementById('coWorker-list').classList.remove('hidden');
+      document.getElementById('colleague-list').classList.add('hidden');
+    });
+    async function loadMessages(friendId) {
+      const response = await fetch(`/api/messages/${friendId}`);
+      const messages = await response.json();
+      const messageContainer = document.querySelector(".message-container");
+      messageContainer.innerHTML = "";
+
+      messages.forEach((message) => {
+        const messageDiv = document.createElement("div");
+        messageDiv.className = `message ${message.sender_id == user_id ? "sent" : "received"
+          }`;
+
+        const senderP = document.createElement("p");
+        senderP.textContent =
+          message.sender_id == user_id ? "You" : message.sender;
+        messageDiv.appendChild(senderP);
+
+        const messageP = document.createElement("p");
+        messageP.textContent = message.message;
+        messageDiv.appendChild(messageP);
+
+        const timestampP = document.createElement("p");
+        timestampP.textContent = new Date(message.timestamp).toLocaleString();
+        messageDiv.appendChild(timestampP);
+
+        messageContainer.appendChild(messageDiv);
+      });
+
+      const messageForm = document.querySelector("form");
+      if (!messageForm) {
+        const formHtml = `
                       <form method="POST" action="/messages">
                         <input type="hidden" name="friend_id" value="${friendId}" />
                         <div class="message-input-container">
@@ -181,31 +190,31 @@
                         </div>
                       </form>
                     `;
-      const formContainer = document.createElement("div");
-      formContainer.innerHTML = formHtml;
-      document.body.appendChild(formContainer.firstChild);
-    } else {
-      const friendIdInput = messageForm.querySelector(
-        'input[type="hidden"]'
-      );
-      friendIdInput.value = friendId;
+        const formContainer = document.createElement("div");
+        formContainer.innerHTML = formHtml;
+        document.body.appendChild(formContainer.firstChild);
+      } else {
+        const friendIdInput = messageForm.querySelector(
+          'input[type="hidden"]'
+        );
+        friendIdInput.value = friendId;
+      }
     }
-  }
 
-  const chatBox = document.querySelector(".message-container");
+    const chatBox = document.querySelector(".message-container");
 
-  const newMessageButton = document.getElementById("new-message-button");
-  const messageInput = document.querySelector(".message-input");
+    const newMessageButton = document.getElementById("new-message-button");
+    const messageInput = document.querySelector(".message-input");
 
-  messageInput.addEventListener("input", () => {
-    newMessageButton.style.display = "block";
-  });
+    messageInput.addEventListener("input", () => {
+      newMessageButton.style.display = "block";
+    });
 
-  newMessageButton.addEventListener("click", () => {
-    scrollToBottom();
-    newMessageButton.style.display = "none";
-  });
-</script>
+    newMessageButton.addEventListener("click", () => {
+      scrollToBottom();
+      newMessageButton.style.display = "none";
+    });
+  </script>
 </body>
 
 </html>

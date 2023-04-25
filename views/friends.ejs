@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Friends</title>
-    <link rel="stylesheet" href="/css/friends.css" />
-  </head>
-  <body>
-    <!-- Navigation bar -->
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Friends</title>
+  <link rel="stylesheet" href="/css/friends.css" />
+</head>
+
+<body>
+  <!-- Navigation bar -->
   <nav class="nav-bar">
     <div class="dropdown">
       <div class="dropdown-content">
@@ -22,67 +24,71 @@
       </div>
     </div>
   </nav>
-    <h1>Friends</h1>
-    <form action="/friends/search" method="post">
-      <input type="text" name="query" placeholder="Search for users" />
-      <button type="submit">Search</button>
-    </form>
+  <h1>Friends</h1>
+  <form action="/friends/search" method="post">
+    <input type="text" name="query" placeholder="Search for users" />
+    <button type="submit">Search</button>
+  </form>
 
-    <h2>Search Results</h2>
-    <ul>
-      <% (searchResults || []).forEach(function(result) { %> <% var isFriend =
-      friends.some(friend => friend.id === result.id); %> <% var hasRequest =
-      requests.some(request => request.id === result.id); %>
-      <li>
-        <%= result.username %> <% if (!isFriend && !hasRequest) { %>
-        <form
-          action="/friends/send-request"
-          method="post"
-          style="display: inline"
-        >
-          <input type="hidden" name="friend_id" value="<%= result.id %>" />
-          <button type="submit">Send Request</button>
-        </form>
-        <% } %>
-      </li>
-      <% }) %>
-    </ul>
+  <h2>Search Results</h2>
+  <ul>
+    <% (searchResults || []).forEach(function(result) { %>
+      <% var isFriend=friends.some(friend=> friend.id === result.id); %> <% var hasRequest=requests.some(request=>
+          request.id === result.id); %>
+          <li>
+            <%= result.username %>
+              <% if (!isFriend && !hasRequest) { %>
+                <form action="/friends/send-request" method="post" style="display: inline">
+                  <input type="hidden" name="friend_id" value="<%= result.id %>" />
+                  <button type="submit">Send Request</button>
+                </form>
+                <% } %>
+          </li>
+          <% }) %>
+  </ul>
 
-    <h2>Friend Requests</h2>
-    <% if (typeof error !== 'undefined' && error) { %>
+  <h2>Friend Requests</h2>
+  <% if (typeof error !=='undefined' && error) { %>
     <!-- Add typeof check here -->
-    <p><%= error %></p>
+    <p>
+      <%= error %>
+    </p>
     <% } %>
-    <ul>
-      <% requests.forEach(function(request) { %>
-      <li>
-        <%= request.username %>
-        <form
-          action="/friends/accept-request"
-          method="post"
-          style="display: inline"
-        >
-          <input type="hidden" name="request_id" value="<%= request.id %>" />
-          <button type="submit">Accept</button>
-        </form>
-        <form
-          action="/friends/decline-request"
-          method="post"
-          style="display: inline"
-        >
-          <input type="hidden" name="request_id" value="<%= request.id %>" />
-          <button type="submit">Decline</button>
-        </form>
-      </li>
-      <% }) %>
-    </ul>
+      <ul>
+        <% requests.forEach(function(request) { %>
+          <li>
+            <%= request.username %>
+              <form action="/friends/accept-request" method="post" style="display: inline">
+                <input type="hidden" name="request_id" value="<%= request.id %>" />
+                <button type="submit">Accept</button>
+              </form>
+              <form action="/friends/decline-request" method="post" style="display: inline">
+                <input type="hidden" name="request_id" value="<%= request.id %>" />
+                <button type="submit">Decline</button>
+              </form>
+          </li>
+          <% }) %>
+      </ul>
 
-    <h2>Friends List</h2>
-    <ul>
-      <% friends.forEach(function(friend) { %>
-      <li><%= friend.username %></li>
-      <% }) %>
-    </ul>
-    <a href="/dashboard">Back to dashboard</a>
-  </body>
+      <h2>Colleagues</h2>
+      <ul>
+        <% friends.filter(friend=> friend.is_colleague).forEach(function(colleague) { %>
+          <li>
+            <%= colleague.username %>
+          </li>
+          <% }) %>
+      </ul>
+
+      <h2>Clients</h2>
+      <ul>
+        <% friends.filter(friend=> !friend.is_colleague).forEach(function(client) { %>
+          <li>
+            <%= client.username %>
+          </li>
+          <% }) %>
+      </ul>
+
+      <a href="/dashboard">Back to dashboard</a>
+</body>
+
 </html>
