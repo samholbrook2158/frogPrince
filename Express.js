@@ -30,6 +30,37 @@ function checkAuth(req, res, next) {
   }
 }
 
+const util = require('util');
+
+function getUnreadCounts(user_id, callback) {
+  connection.query(
+    "SELECT friendships.is_colleague, COUNT(*) as unread_count FROM friendships JOIN friend_chats ON friendships.friend_id = friend_chats.sender_id WHERE friendships.user_id = ? AND friend_chats.receiver_id = ? AND friend_chats.is_read = 0 GROUP BY friendships.is_colleague",
+    [user_id, user_id],
+    function (err, rows) {
+      if (err) {
+        console.error("Error fetching unread counts:", err);
+        callback(err, null);
+      } else {
+        let colleagueUnreadCount = 0;
+        let clientUnreadCount = 0;
+
+        rows.forEach(row => {
+          if (row.is_colleague === 1) {
+            colleagueUnreadCount = row.unread_count;
+          } else {
+            clientUnreadCount = row.unread_count;
+          }
+        });
+
+        callback(null, {
+          colleagueUnreadCount: colleagueUnreadCount,
+          clientUnreadCount: clientUnreadCount,
+        });
+      }
+    }
+  );
+}
+
 router.get("/about", function (req, res) {
   res.render("about");
 });
@@ -99,28 +130,40 @@ router.get("/messages/:friend_id", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.params.friend_id;
 
-  connection.query(
-    "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
-    [user_id, "accepted"],
-    function (err, friends, fields) {
-      if (err) throw err;
-
-      connection.query(
-        "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp ASC",
-        [user_id, friend_id, friend_id, user_id],
-        function (err, messages, fields) {
-          if (err) throw err;
-
-          res.render("messages", {
-            messages: messages,
-            user_id: user_id,
-            friend_id: friend_id,
-            friends: friends,
-          });
-        }
-      );
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
     }
-  );
+
+    connection.query(
+      "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+      [user_id, "accepted"],
+      function (err, friends, fields) {
+        if (err) throw err;
+
+        connection.query(
+          "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp ASC",
+          [user_id, friend_id, friend_id, user_id],
+          function (err, messages, fields) {
+            if (err) throw err;
+
+            const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+            res.render("messages", {
+              messages: messages,
+              user_id: user_id,
+              friend_id: friend_id,
+              friends: friends,
+              colleagueUnreadCount: unreadCounts.colleagueUnreadCount,
+              clientUnreadCount: unreadCounts.clientUnreadCount,
+              totalUnreadMessages: totalUnreadMessages,
+            });
+          }
+        );
+      }
+    );
+  });
 });
 
 router.get("/download/:message_id", checkAuth, function (req, res) {

@@ -17,7 +17,14 @@
         <a href="/dashboard" class="nav-button">Home</a>
         <a href="/account" class="nav-button">Account</a>
         <a href="/friends" class="nav-button">Friends</a>
-        <a href="/messages" class="nav-button">Messages</a>
+        <a href="/messages" class="nav-button">
+          Messages
+          <% if (totalUnreadMessages> 0) { %>
+            <span class="unread-count">
+              <%= totalUnreadMessages %>
+            </span>
+            <% } %>
+        </a>
         <a href="/renewal" class="nav-button">Renewals</a>
         <a href="/about" class="nav-button">About us</a>
         <a href="/FAQ" class="nav-button">FAQ</a>
@@ -28,21 +35,41 @@
   <div class="content-wrapper">
     <div class="lists-container">
       <div class="tabs">
-        <button class="tab-button active" id="colleague-tab">Colleagues</button>
-        <button class="tab-button" id="coWorker-tab">Clients</button>
+        <button class="tab-button active" id="colleague-tab">
+          Colleagues
+          <% if (colleagueUnreadCount> 0) { %>
+            <span class="unread-count">
+              <%= colleagueUnreadCount %>
+            </span>
+            <% } %>
+        </button>
+        <button class="tab-button" id="coWorker-tab">
+          Clients
+          <% if (clientUnreadCount> 0) { %>
+            <span class="unread-count">
+              <%= clientUnreadCount %>
+            </span>
+            <% } %>
+        </button>
       </div>
       <div class="lists">
         <div class="list-wrapper" id="colleague-list">
           <input type="text" class="search-input" placeholder="Search colleagues" onkeyup="filterList('colleague')" />
           <div class="list-box">
             <ul>
+              <!-- Colleague list -->
               <% friends.filter(friend=> friend.is_colleague).forEach(function(friend) { %>
                 <li class="friend" data-id="<%= friend.friend_id %>">
                   <a href="/messages/<%= friend.friend_id %>">
                     <%= friend.friend_name %>
+                      <% if (friend.unread_count> 0) { %>
+                        <span class="unread-count">
+                          <%= friend.unread_count %>
+                        </span>
+                        <% } %>
                   </a>
                 </li>
-              <% }) %>
+                <% }) %>
             </ul>
           </div>
         </div>
@@ -50,20 +77,26 @@
           <input type="text" class="search-input" placeholder="Search clients" onkeyup="filterList('coWorker')" />
           <div class="list-box">
             <ul>
+              <!-- Client list -->
               <% friends.filter(friend=> !friend.is_colleague).forEach(function(friend) { %>
                 <li class="friend" data-id="<%= friend.friend_id %>">
                   <a href="/messages/<%= friend.friend_id %>">
                     <%= friend.friend_name %>
+                      <% if (friend.unread_count> 0) { %>
+                        <span class="unread-count">
+                          <%= friend.unread_count %>
+                        </span>
+                        <% } %>
                   </a>
                 </li>
-              <% }) %>
+                <% }) %>
             </ul>
           </div>
         </div>
-      </div>      
+      </div>
     </div>
 
-    <div class="message-container">
+    <div class="message-container" id="message-container">
       <% if (typeof friend_id !=='undefined' ) { %>
         <% var currentFriend=friends.find(friend=> friend.friend_id == friend_id); %>
           <% if (currentFriend) { %>
@@ -115,12 +148,30 @@
       <!-- Your data container content goes here -->
     </div>
   </div>
-  <script>document.querySelectorAll(".friend").forEach((friendListItem) => {
+  <script>
+    // Keeps scroll bar at bottom after sending message
+    document.querySelector('form').addEventListener('submit', (e) => {
+      e.preventDefault();
+      sessionStorage.setItem('scrollPosition', document.getElementById('message-container').scrollTop);
+      e.target.submit();
+    });
+
+    window.addEventListener('DOMContentLoaded', () => {
+      const scrollPosition = sessionStorage.getItem('scrollPosition');
+      if (scrollPosition) {
+        document.getElementById('message-container').scrollTop = scrollPosition;
+        sessionStorage.removeItem('scrollPosition');
+      }
+    });
+
+
+    document.querySelectorAll(".friend").forEach((friendListItem) => {
       friendListItem.addEventListener("click", (event) => {
         const friendId = event.currentTarget.getAttribute("data-id");
         window.location.href = `/messages/${friendId}`;
       });
     });
+
     function filterList(listType) {
       const input = document.querySelector(`#${listType}-list .search-input`);
       const filter = input.value.toUpperCase();
@@ -140,6 +191,7 @@
     }
 
     document.getElementById('colleague-tab').addEventListener('click', function () {
+      localStorage.setItem('activeTab', 'colleague');
       document.getElementById('colleague-tab').classList.add('active');
       document.getElementById('coWorker-tab').classList.remove('active');
       document.getElementById('colleague-list').classList.remove('hidden');
@@ -147,72 +199,20 @@
     });
 
     document.getElementById('coWorker-tab').addEventListener('click', function () {
+      localStorage.setItem('activeTab', 'coWorker');
       document.getElementById('coWorker-tab').classList.add('active');
       document.getElementById('colleague-tab').classList.remove('active');
       document.getElementById('coWorker-list').classList.remove('hidden');
       document.getElementById('colleague-list').classList.add('hidden');
     });
-    async function loadMessages(friendId) {
-      const response = await fetch(`/api/messages/${friendId}`);
-      const messages = await response.json();
-      const messageContainer = document.querySelector(".message-container");
-      messageContainer.innerHTML = "";
 
-      messages.forEach((message) => {
-        const messageDiv = document.createElement("div");
-        messageDiv.className = `message ${message.sender_id == user_id ? "sent" : "received"
-          }`;
-
-        const senderP = document.createElement("p");
-        senderP.textContent =
-          message.sender_id == user_id ? "You" : message.sender;
-        messageDiv.appendChild(senderP);
-
-        const messageP = document.createElement("p");
-        messageP.textContent = message.message;
-        messageDiv.appendChild(messageP);
-
-        const timestampP = document.createElement("p");
-        timestampP.textContent = new Date(message.timestamp).toLocaleString();
-        messageDiv.appendChild(timestampP);
-
-        messageContainer.appendChild(messageDiv);
-      });
-
-      const messageForm = document.querySelector("form");
-      if (!messageForm) {
-        const formHtml = `
-                      <form method="POST" action="/messages">
-                        <input type="hidden" name="friend_id" value="${friendId}" />
-                        <div class="message-input-container">
-                          <input type="text" name="message" class="message-input" required />
-                          <button type="submit" class="send-button">Send</button>
-                        </div>
-                      </form>
-                    `;
-        const formContainer = document.createElement("div");
-        formContainer.innerHTML = formHtml;
-        document.body.appendChild(formContainer.firstChild);
+    window.addEventListener('DOMContentLoaded', () => {
+      const activeTab = localStorage.getItem('activeTab');
+      if (activeTab === 'coWorker') {
+        document.getElementById('coWorker-tab').click();
       } else {
-        const friendIdInput = messageForm.querySelector(
-          'input[type="hidden"]'
-        );
-        friendIdInput.value = friendId;
+        document.getElementById('colleague-tab').click();
       }
-    }
-
-    const chatBox = document.querySelector(".message-container");
-
-    const newMessageButton = document.getElementById("new-message-button");
-    const messageInput = document.querySelector(".message-input");
-
-    messageInput.addEventListener("input", () => {
-      newMessageButton.style.display = "block";
-    });
-
-    newMessageButton.addEventListener("click", () => {
-      scrollToBottom();
-      newMessageButton.style.display = "none";
     });
   </script>
 </body>
