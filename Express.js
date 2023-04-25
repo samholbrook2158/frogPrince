@@ -68,7 +68,6 @@ router.get("/messages", checkAuth, function (req, res) {
   );
 });
 
-
 router.post("/messages", checkAuth, upload.single('file'), function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.body.friend_id;
@@ -101,7 +100,7 @@ router.get("/messages/:friend_id", checkAuth, function (req, res) {
   const friend_id = req.params.friend_id;
 
   connection.query(
-    "SELECT users.id as friend_id, users.username as friend_name FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+    "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
     [user_id, "accepted"],
     function (err, friends, fields) {
       if (err) throw err;
@@ -123,7 +122,6 @@ router.get("/messages/:friend_id", checkAuth, function (req, res) {
     }
   );
 });
-
 
 router.get("/download/:message_id", checkAuth, function (req, res) {
   const message_id = req.params.message_id;
@@ -154,7 +152,6 @@ router.get("/download/:message_id", checkAuth, function (req, res) {
     }
   );
 });
-
 
 router.get("/api/messages/:friend_id", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
