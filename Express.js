@@ -61,6 +61,21 @@ function getUnreadCounts(user_id, callback) {
   );
 }
 
+function setUnreadCountToZero(user_id, friend_id, callback) {
+  connection.query(
+    "UPDATE friend_chats SET is_read = 1 WHERE receiver_id = ? AND sender_id = ? AND is_read = 0",
+    [user_id, friend_id],
+    function (err, result) {
+      if (err) {
+        console.error("Error setting unread count to zero:", err);
+        return callback(err);
+      }
+
+      callback(null);
+    }
+  );
+}
+
 router.get("/about", function (req, res) {
   res.render("about");
 });
@@ -126,43 +141,72 @@ router.post("/messages", checkAuth, upload.single('file'), function (req, res) {
   );
 });
 
+function updateIsReadStatus(user_id, friend_id, callback) {
+  connection.query(
+    "UPDATE friend_chats SET is_read = 1 WHERE receiver_id = ? AND sender_id = ? AND is_read = 0",
+    [user_id, friend_id],
+    function (err, result) {
+      if (err) {
+        console.error("Error updating is_read status:", err);
+        return callback(err);
+      }
+
+      callback(null);
+    }
+  );
+}
+
 router.get("/messages/:friend_id", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.params.friend_id;
 
-  getUnreadCounts(user_id, function (err, unreadCounts) {
+  updateIsReadStatus(user_id, friend_id, function (err) {
     if (err) {
-      console.error("Error fetching unread counts:", err);
-      return res.status(500).send("Failed to fetch unread counts");
+      console.error("Error updating is_read status:", err);
+      return res.status(500).send("Failed to update is_read status");
     }
 
-    connection.query(
-      "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
-      [user_id, "accepted"],
-      function (err, friends, fields) {
-        if (err) throw err;
+    setUnreadCountToZero(user_id, friend_id, function (err) {
+      if (err) {
+        console.error("Error updating unread count:", err);
+        return res.status(500).send("Failed to update unread count");
+      }
+
+      getUnreadCounts(user_id, function (err, unreadCounts) {
+        if (err) {
+          console.error("Error fetching unread counts:", err);
+          return res.status(500).send("Failed to fetch unread counts");
+        }
 
         connection.query(
-          "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp ASC",
-          [user_id, friend_id, friend_id, user_id],
-          function (err, messages, fields) {
+          "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague, COUNT(friend_chats.is_read=0 OR NULL) as unread_count FROM friendships JOIN users ON friendships.friend_id = users.id LEFT JOIN friend_chats ON friendships.friend_id = friend_chats.sender_id AND friend_chats.receiver_id = ? AND friend_chats.is_read = 0 WHERE friendships.user_id = ? AND friendships.status = ? GROUP BY users.id, friendships.is_colleague",
+          [user_id, user_id, "accepted"],
+          function (err, friends, fields) {
             if (err) throw err;
 
-            const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+            connection.query(
+              "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp ASC",
+              [user_id, friend_id, friend_id, user_id],
+              function (err, messages, fields) {
+                if (err) throw err;
 
-            res.render("messages", {
-              messages: messages,
-              user_id: user_id,
-              friend_id: friend_id,
-              friends: friends,
-              colleagueUnreadCount: unreadCounts.colleagueUnreadCount,
-              clientUnreadCount: unreadCounts.clientUnreadCount,
-              totalUnreadMessages: totalUnreadMessages,
-            });
+                const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+                res.render("messages", {
+                  messages: messages,
+                  user_id: user_id,
+                  friend_id: friend_id,
+                  friends: friends,
+                  colleagueUnreadCount: unreadCounts.colleagueUnreadCount,
+                  clientUnreadCount: unreadCounts.clientUnreadCount,
+                  totalUnreadMessages: totalUnreadMessages,
+                });
+              }
+            );
           }
         );
-      }
-    );
+      });
+    });
   });
 });
 
