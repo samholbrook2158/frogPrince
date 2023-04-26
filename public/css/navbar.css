@@ -1,0 +1,9 @@
+/* navbar.css */
+.unread-count {
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.8em;
+  margin-left: 5px;
+}

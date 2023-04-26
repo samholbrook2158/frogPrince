@@ -1,0 +1,142 @@
+<style>
+  /* Navigation bar styles */
+.nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 50px;
+  background-color: black;
+  z-index: 1;
+}
+
+h3 {
+  margin-bottom: 30px;
+  font-family: Arial, sans-serif;
+}
+
+.unread-count {
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 5px;
+  font-size: 0.8em;
+  margin-left: 5px;
+}
+
+/* Dropdown menu styles */
+.dropdown {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgb(21, 114, 28), rgb(44, 172, 53));
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+
+.dropdown.active {
+  width: calc(100% - 200px);
+}
+
+.dropdown-content {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.dropdown-content a {
+  display: block;
+  padding: 10px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.dropdown-content a:hover {
+  background-color: #333;
+}
+
+/* Black bar styles */
+.black-bar {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.nav-button {
+  padding: 10px;
+  color: #fff;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  margin-top: 10px;
+  line-height: 50px;
+}
+
+.nav-button:hover {
+  background-color: #333333;
+  padding: 0 30px;
+}
+
+h1 {
+  margin-bottom: 30px;
+  font-family: Arial, sans-serif;
+}
+
+a {
+  display: inline-block;
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  text-align: center;
+  color: #333;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 18px;
+  margin-bottom: 20px;
+  transition: all 0.3s ease;
+}
+
+a.message-button {
+  border: 2px solid #333;
+  border-radius: 5px;
+  padding: 20px;
+  box-shadow: 0 0 0 10px green;
+  border-color: rgb(0, 0, 0);
+  border-style: solid;
+  transition: all 0.3s ease;
+}
+
+a:hover {
+  background-color: #333;
+  color: white;
+}
+</style>
+<nav class="nav-bar">
+  <div class="dropdown">
+    <div class="dropdown-content">
+      <a href="/dashboard" class="nav-button">Home</a>
+      <a href="/account" class="nav-button">Account</a>
+      <a href="/friends" class="nav-button">Friends</a>
+      <a href="/messages" class="nav-button">
+        Messages
+        <% if (totalUnreadMessages > 0) { %>
+          <span class="unread-count">
+            <%= totalUnreadMessages %>
+          </span>
+        <% } %>
+      </a>
+      <a href="/renewal" class="nav-button">Renewals</a>
+      <a href="/about" class="nav-button">About us</a>
+      <a href="/FAQ" class="nav-button">FAQ</a>
+      <a href="/logout" class="nav-button">Sign out</a>
+    </div>
+  </div>
+</nav>

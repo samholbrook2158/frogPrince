@@ -122,45 +122,8 @@ app.post('/signup', function (req, res) {
     });
 });
 
-function getUnreadCounts(user_id, callback) {
-    db.query(
-      "SELECT friendships.is_colleague, COUNT(*) as unread_count FROM friendships JOIN friend_chats ON friendships.friend_id = friend_chats.sender_id WHERE friendships.user_id = ? AND friend_chats.receiver_id = ? AND friend_chats.is_read = 0 GROUP BY friendships.is_colleague",
-      [user_id, user_id],
-      function (err, rows) {
-        if (err) {
-          console.error("Error fetching unread counts:", err);
-          callback(err, null);
-        } else {
-          let colleagueUnreadCount = 0;
-          let clientUnreadCount = 0;
-  
-          rows.forEach(row => {
-            if (row.is_colleague === 1) {
-              colleagueUnreadCount = row.unread_count;
-            } else {
-              clientUnreadCount = row.unread_count;
-            }
-          });
-  
-          callback(null, {
-            colleagueUnreadCount: colleagueUnreadCount,
-            clientUnreadCount: clientUnreadCount,
-          });
-        }
-      }
-    );
-}
-
 app.get("/dashboard", function (req, res) {
     var user_id = req.cookies.user_id;
-
-    getUnreadCounts(user_id, function (err, unreadCounts) {
-        if (err) {
-          console.error("Error fetching unread counts:", err);
-          return res.status(500).send("Failed to fetch unread counts");
-        }
-    
-        const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
     if (!user_id) {
         return res.redirect("/login");
@@ -171,13 +134,9 @@ app.get("/dashboard", function (req, res) {
             res.redirect("/login");
         } else {
             var username = results[0].username;
-            res.render("dashboard", { 
-            username: username,
-            totalUnreadMessages: totalUnreadMessages 
-        });
+            res.render("dashboard", { username: username });
         }
     });
-});
 });
 
 // Mounts the Express.js middleware

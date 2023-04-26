@@ -77,11 +77,37 @@ function setUnreadCountToZero(user_id, friend_id, callback) {
 }
 
 router.get("/about", function (req, res) {
-  res.render("about");
+  const user_id = req.cookies.user_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+    
+  res.render("about", {
+    totalUnreadMessages: totalUnreadMessages
+  });
+});
 });
 
 router.get("/FAQ", function (req, res) {
-  res.render("FAQ");
+  const user_id = req.cookies.user_id;
+  
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+  res.render("FAQ", {
+    totalUnreadMessages: totalUnreadMessages
+  });
+});
 });
 
 router.get("/messages", checkAuth, function (req, res) {
@@ -274,30 +300,41 @@ router.get("/api/messages/:friend_id/since/:last_message_id", checkAuth, functio
 router.get("/friends", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
-  connection.query(
-    "SELECT users.*, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
-    [user_id, "accepted"],
-    function (err, friends, fields) {
-      if (err) throw err;
-
-      connection.query(
-        "SELECT users.* FROM friendships JOIN users ON friendships.user_id = users.id WHERE friendships.friend_id = ? AND friendships.status = ?",
-        [user_id, "pending"],
-        function (err, requests, fields) {
-          if (err) throw err;
-
-          res.render("friends", {
-            friends: friends,
-            requests: requests,
-            user_id: user_id,
-            error: "",
-            searchResults: [],
-          });
-        }
-      );
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
     }
-  );
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+    connection.query(
+      "SELECT users.*, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+      [user_id, "accepted"],
+      function (err, friends, fields) {
+        if (err) throw err;
+
+        connection.query(
+          "SELECT users.* FROM friendships JOIN users ON friendships.user_id = users.id WHERE friendships.friend_id = ? AND friendships.status = ?",
+          [user_id, "pending"],
+          function (err, requests, fields) {
+            if (err) throw err;
+
+            res.render("friends", {
+              friends: friends,
+              requests: requests,
+              user_id: user_id,
+              error: "",
+              searchResults: [],
+              totalUnreadMessages: totalUnreadMessages, // Pass the totalUnreadMessages variable
+            });
+          }
+        );
+      }
+    );
+  });
 });
+
 
 router.post("/friends/search", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
@@ -321,11 +358,20 @@ router.post("/friends/search", checkAuth, function (req, res) {
             function (err, requests, fields) {
               if (err) throw err;
 
+              getUnreadCounts(user_id, function (err, unreadCounts) {
+                if (err) {
+                  console.error("Error fetching unread counts:", err);
+                  return res.status(500).send("Failed to fetch unread counts");
+                }
+            
+              const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
               res.render("friends", {
                 friends: friends,
                 requests: requests,
                 searchResults: searchResults,
                 error: "",
+                totalUnreadMessages: totalUnreadMessages
               });
             }
           );
@@ -333,11 +379,20 @@ router.post("/friends/search", checkAuth, function (req, res) {
       );
     }
   );
+  });
 });
 
 router.post("/friends/send-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const friend_id = req.body.friend_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   connection.query(
     "SELECT * FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
@@ -351,6 +406,7 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
           friends: [],
           requests: [],
           searchResults: [],
+          totalUnreadMessages: totalUnreadMessages
         });
       } else {
         connection.query(
@@ -375,11 +431,20 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
       }
     }
   );
+  });
 });
 
 router.post("/friends/accept-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const request_id = req.body.request_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   connection.query(
     "SELECT is_colleague FROM friendships WHERE user_id = ? AND friend_id = ?",
@@ -407,11 +472,20 @@ router.post("/friends/accept-request", checkAuth, function (req, res) {
       );
     }
   );
+  });
 });
 
 router.post("/friends/decline-request", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const request_id = req.body.request_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   connection.query(
     "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
@@ -422,11 +496,20 @@ router.post("/friends/decline-request", checkAuth, function (req, res) {
       res.redirect("/friends");
     }
   );
+  });
 });
 
 router.get("/account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const editing = req.query.editing === 'true';
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   connection.query(
     "SELECT * FROM users WHERE id = ?",
@@ -436,14 +519,23 @@ router.get("/account", checkAuth, function (req, res) {
 
       const user = rows[0];
 
-      res.render("account", { user: user, editing: editing });
+      res.render("account", { user: user, editing: editing, totalUnreadMessages: totalUnreadMessages });
     }
   );
+  });
 });
 
 // Delete account and remove friendships
 router.post("/delete-account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   // Delete friendships
   connection.query(
@@ -468,11 +560,20 @@ router.post("/delete-account", checkAuth, function (req, res) {
       );
     }
   );
+  });
 });
 
 router.post("/edit-account", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
   const { username, email, organization, role } = req.body;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
   connection.query(
     "UPDATE users SET username = ?, email = ?, organization = ?, role = ? WHERE id = ?",
@@ -484,10 +585,23 @@ router.post("/edit-account", checkAuth, function (req, res) {
       res.redirect("/account");
     }
   );
+  });
 });
 
 router.get("/renewal", function (req, res) {
-  res.render("renewal");
+  const user_id = req.cookies.user_id;
+
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
+    }
+    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+  res.render("renewal", {
+    totalUnreadMessages: totalUnreadMessages
+  });
+});
 });
 
 module.exports = router;
