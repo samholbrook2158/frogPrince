@@ -10,28 +10,7 @@
 </head>
 
 <body>
-  <!-- Navigation bar -->
-  <nav class="nav-bar">
-    <div class="dropdown">
-      <div class="dropdown-content">
-        <a href="/dashboard" class="nav-button">Home</a>
-        <a href="/account" class="nav-button">Account</a>
-        <a href="/friends" class="nav-button">Friends</a>
-        <a href="/messages" class="nav-button">
-          Messages
-          <% if (totalUnreadMessages> 0) { %>
-            <span class="unread-count">
-              <%= totalUnreadMessages %>
-            </span>
-            <% } %>
-        </a>
-        <a href="/renewal" class="nav-button">Renewals</a>
-        <a href="/about" class="nav-button">About us</a>
-        <a href="/FAQ" class="nav-button">FAQ</a>
-        <a href="/logout" class="nav-button">Sign out</a>
-      </div>
-    </div>
-  </nav>
+  <%- include('./partials/navbar') %>
   <div class="content-wrapper">
     <div class="lists-container">
       <div class="tabs">
@@ -146,7 +125,7 @@
                             <% } %>
                   </div>
                   <div class="data-container">
-                    <!-- Your data container content goes here -->
+                    <h2>Data for: <%= currentFriend.friend_name %></h2>
                   </div>
     </div>
     <script>
