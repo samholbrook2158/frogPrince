@@ -4,13 +4,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Friends</title>
+  <title>Contacts</title>
   <link rel="stylesheet" href="/css/friends.css" />
 </head>
 
 <body>
   <%- include('./partials/navbar') %>
-  <h1>Friends</h1>
+  <h1>Contacts</h1>
   <form action="/friends/search" method="post">
     <input type="text" name="query" placeholder="Search for users" />
     <button type="submit">Search</button>
@@ -33,9 +33,8 @@
           <% }) %>
   </ul>
 
-  <h2>Friend Requests</h2>
+  <h2>Incoming Requests</h2>
   <% if (typeof error !=='undefined' && error) { %>
-    <!-- Add typeof check here -->
     <p>
       <%= error %>
     </p>
@@ -73,8 +72,6 @@
           </li>
           <% }) %>
       </ul>
-
-      <a href="/dashboard">Back to dashboard</a>
 </body>
 
 </html>
