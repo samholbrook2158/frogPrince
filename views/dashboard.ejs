@@ -11,93 +11,49 @@
 <body>
   <%- include('./partials/navbar') %>
 
-  <!-- Main content -->
-  <main>
-    <h1 class="welcome-message">frogPrince Dashboard</h1>
-    <div class="renewal-sections">
-      <div class="renewal-container">
-        <h2>Ongoing renewals</h2>
-        <div class="renewal-box"></div>
-      </div>
-      <div class="renewal-container">
-        <h2>Upcoming renewals</h2>
-        <div class="renewal-box"></div>
-      </div>
-      <div class="renewal-container">
-        <h2>Finished renewals</h2>
-        <div class="renewal-box"></div>
-      </div>
-    </div>
-    <section class="activity-section">
-      <h2>Activity</h2>
-      <div class="table-wrapper">
-        <table>
-          <thead>
-            <tr>
-              <th>Activity name</th>
-              <th>Details</th>
-              <th>Start date</th>
-              <th>Status</th>
-              <th>Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>Activity 1</td>
-              <td>Activity 1 details</td>
-              <td>2023-04-01</td>
-              <td>In progress</td>
-              <td><a href="#">Link 1</a></td>
-            </tr>
-            <tr>
-              <td>Activity 2</td>
-              <td>Activity 2 details</td>
-              <td>2023-04-15</td>
-              <td>Completed</td>
-              <td><a href="#">Link 2</a></td>
-            </tr>
-            <tr>
-              <td>Activity 3</td>
-              <td>Activity 3 details</td>
-              <td>2023-04-20</td>
-              <td>In progress</td>
-              <td><a href="#">Link 3</a></td>
-            </tr>
-            <tr>
-              <td>Activity 1</td>
-              <td>Activity 1 details</td>
-              <td>2023-04-01</td>
-              <td>In progress</td>
-              <td><a href="#">Link 1</a></td>
-            </tr>
-            <tr>
-              <td>Activity 2</td>
-              <td>Activity 2 details</td>
-              <td>2023-04-15</td>
-              <td>Completed</td>
-              <td><a href="#">Link 2</a></td>
-            </tr>
-            <tr>
-              <td>Activity 3</td>
-              <td>Activity 3 details</td>
-              <td>2023-04-20</td>
-              <td>In progress</td>
-              <td><a href="#">Link 3</a></td>
-            </tr>
-          </tbody>          
-        </table>
-      </div>
-    </section>
-  </main>
+    <!-- Main content -->
+    <main>
+      <h1 class="welcome-message">frogPrince Dashboard</h1>
+      <div class="renewal-sections">
+        <!-- Ongoing Renewals -->
+        <div id="ongoing-renewals" class="renewal-box"></div>
 
-  <script>
-    function toggleMenu() {
-      const dropdown = document.querySelector(".dropdown");
-      const hamburger = document.querySelector(".hamburger");
-      dropdown.classList.toggle("active");
-      hamburger.classList.toggle("active");
-    }
-  </script>
+        <!-- Upcoming Renewals -->
+        <div id="upcoming-renewals" class="renewal-box"></div>
+
+        <!-- Finished Renewals -->
+        <div id="finished-renewals" class="renewal-box"></div>
+
+      </div>
+      <section class="activity-section">
+        <h2>Activity</h2>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Activity name</th>
+                <th>Details</th>
+                <th>Start date</th>
+                <th>Status</th>
+                <th>Link</th>
+              </tr>
+            </thead>
+            <tbody id="activity-table-body">
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function toggleMenu() {
+        const dropdown = document.querySelector(".dropdown");
+        const hamburger = document.querySelector(".hamburger");
+        dropdown.classList.toggle("active");
+        hamburger.classList.toggle("active");
+      }
+    </script>
+    <script src="/dashboard.js"></script>
 </body>
 
 </html>

@@ -129,7 +129,6 @@ a:hover {
   line-height: 50px;
 }
 
-
 .nav-button:hover {
   background-color: #333333;
   padding: 0 30px;
@@ -168,7 +167,7 @@ a:hover {
 
 .renewal-box {
   width: 300px;
-  height: 400px;
+  height: 300px;
   border: 2px solid #333;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

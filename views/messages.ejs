@@ -6,198 +6,202 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Messages</title>
   <link rel="stylesheet" href="/css/messages.css" />
-  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
   <%- include('./partials/navbar') %>
-  <div class="content-wrapper">
-    <div class="lists-container">
-      <div class="tabs">
-        <button class="tab-button active" id="colleague-tab">
-          Colleagues
-          <% if (colleagueUnreadCount> 0) { %>
-            <span class="unread-count">
-              <%= colleagueUnreadCount %>
-            </span>
-            <% } %>
-        </button>
-        <button class="tab-button" id="coWorker-tab">
-          Clients
-          <% if (clientUnreadCount> 0) { %>
-            <span class="unread-count">
-              <%= clientUnreadCount %>
-            </span>
-            <% } %>
-        </button>
-      </div>
-      <div class="lists">
-        <div class="list-wrapper" id="colleague-list">
-          <input type="text" class="search-input" placeholder="Search colleagues" onkeyup="filterList('colleague')" />
-          <div class="list-box">
-            <ul>
-              <!-- Colleague list -->
-              <% friends.filter(friend=> friend.is_colleague).forEach(function(friend) { %>
-                <li class="friend" data-id="<%= friend.friend_id %>">
-                  <a href="/messages/<%= friend.friend_id %>">
-                    <%= friend.friend_name %>
-                      <% if (friend.unread_count> 0) { %>
-                        <span class="unread-count">
-                          <%= friend.unread_count %>
-                        </span>
-                        <% } %>
-                  </a>
-                </li>
-                <% }) %>
-            </ul>
-          </div>
-        </div>
-        <div class="list-wrapper hidden" id="coWorker-list">
-          <input type="text" class="search-input" placeholder="Search clients" onkeyup="filterList('coWorker')" />
-          <div class="list-box">
-            <ul>
-              <!-- Client list -->
-              <% friends.filter(friend=> !friend.is_colleague).forEach(function(friend) { %>
-                <li class="friend" data-id="<%= friend.friend_id %>">
-                  <a href="/messages/<%= friend.friend_id %>">
-                    <%= friend.friend_name %>
-                      <% if (friend.unread_count> 0) { %>
-                        <span class="unread-count">
-                          <%= friend.unread_count %>
-                        </span>
-                        <% } %>
-                  </a>
-                </li>
-                <% }) %>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="chat-wrapper">
-      <% if (typeof friend_id !=='undefined' ) { %>
-        <% var currentFriend=friends.find(friend=> friend.friend_id == friend_id); %>
-          <% if (currentFriend) { %>
-            <h3 class="chat-heading">You are chatting with: <%= currentFriend.friend_name %>
-            </h3>
-            <% } else { %>
-              <h3>Friend not found.</h3>
+    <div class="content-wrapper">
+      <div class="lists-container">
+        <div class="tabs">
+          <button class="tab-button active" id="colleague-tab">
+            Colleagues
+            <% if (colleagueUnreadCount> 0) { %>
+              <span class="unread-count">
+                <%= colleagueUnreadCount %>
+              </span>
               <% } %>
+          </button>
+          <button class="tab-button" id="coWorker-tab">
+            External contacts
+            <% if (clientUnreadCount> 0) { %>
+              <span class="unread-count">
+                <%= clientUnreadCount %>
+              </span>
+              <% } %>
+          </button>
+        </div>
+        <div class="lists">
+          <div class="list-wrapper" id="colleague-list">
+            <input type="text" class="search-input" placeholder="Search colleagues" onkeyup="filterList('colleague')" />
+            <div class="list-box">
+              <ul>
+                <!-- Colleague list -->
+                <% friends.filter(friend=> friend.is_colleague).forEach(function(friend) { %>
+                  <li class="friend" data-id="<%= friend.friend_id %>">
+                    <a href="/messages/<%= friend.friend_id %>">
+                      <%= friend.friend_name %>
+                        <% if (friend.unread_count> 0) { %>
+                          <span class="unread-count">
+                            <%= friend.unread_count %>
+                          </span>
+                          <% } %>
+                    </a>
+                  </li>
+                  <% }) %>
+              </ul>
+            </div>
+          </div>
+          <div class="list-wrapper hidden" id="coWorker-list">
+            <input type="text" class="search-input" placeholder="Search clients" onkeyup="filterList('coWorker')" />
+            <div class="list-box">
+              <ul>
+                <!-- Client list -->
+                <% friends.filter(friend=> !friend.is_colleague).forEach(function(friend) { %>
+                  <li class="friend" data-id="<%= friend.friend_id %>">
+                    <a href="/messages/<%= friend.friend_id %>">
+                      <%= friend.friend_name %>
+                        <% if (friend.unread_count> 0) { %>
+                          <span class="unread-count">
+                            <%= friend.unread_count %>
+                          </span>
+                          <% } %>
+                    </a>
+                  </li>
+                  <% }) %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chat-wrapper">
+        <% if (typeof friend_id !=='undefined' ) { %>
+          <% var currentFriend=friends.find(friend=> friend.friend_id == friend_id); %>
+            <% if (currentFriend) { %>
+              <h3 class="chat-heading">You are chatting with: <%= currentFriend.friend_name %>
+              </h3>
+              <% } else { %>
+                <h3>Friend not found.</h3>
                 <% } %>
-                  <div class="message-container" id="message-container">
-                    <% for (var i=0; i < messages.length; i++) { %>
-                      <% var message=messages[i]; %>
-                        <div class="message <%= message.sender_id == user_id ? 'sent' : 'received' %>">
-                          <div class="message-content">
-                            <% if (message.message) { %>
+                  <% } %>
+                    <div class="message-container" id="message-container">
+                      <% for (var i=0; i < messages.length; i++) { %>
+                        <% var message=messages[i]; %>
+                          <div class="message <%= message.sender_id == user_id ? 'sent' : 'received' %>">
+                            <div class="message-content">
+                              <% if (message.message) { %>
+                                <p>
+                                  <%= message.message %>
+                                </p>
+                                <% } %>
+                                  <% if (message.file_path) { %>
+                                    <p>
+                                      Download: <a href="/download/<%= message.id %>" target="_blank">
+                                        <span class="file-name">
+                                          <%= message.original_filename %>
+                                        </span>
+                                      </a>
+                                    </p>
+                                    <% } %>
+                            </div>
+                            <div class="message-timestamp">
                               <p>
-                                <%= message.message %>
+                                <%= message.timestamp.toLocaleString() %>
                               </p>
+                            </div>
+                          </div>
+                          <% } %>
+                            <% if (typeof friend_id !=='undefined' ) { %>
+                              <form method="POST" action="/messages" enctype="multipart/form-data" novalidate>
+                                <input type="hidden" name="friend_id" value="<%= friend_id %>" />
+                                <div class="message-input-container">
+                                  <input type="text" name="message" class="message-input" required />
+                                  <input type="file" name="file" />
+                                  <button type="submit" class="send-button">Send</button>
+                                </div>
+                              </form>
                               <% } %>
-                                <% if (message.file_path) { %>
-                                  <p>
-                                    Download: <a href="/download/<%= message.id %>" target="_blank">
-                                      <span class="file-name">
-                                        <%= message.original_filename %>
-                                      </span>
-                                    </a>
-                                  </p>
-                                  <% } %>
-                          </div>
-                          <div class="message-timestamp">
-                            <p>
-                              <%= message.timestamp.toLocaleString() %>
-                            </p>
-                          </div>
-                        </div>
-                        <% } %>
+                    </div>
+                    <div class="data-container">
+                      <h3>Organization data: demo %></h3>
+                      <div class="line-chart-container">
+                        <canvas id="renewal-chart"></canvas>
+                        <div id="renewal-info"></div>
+                      </div>
+                    </div>
+      </div>
+      <script>
+        // Keeps scroll bar at bottom after sending message
+        function scrollToBottom() {
+          const messageContainer = document.getElementById('message-container');
+          messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
 
-                          <% if (typeof friend_id !=='undefined' ) { %>
-                            <form method="POST" action="/messages" enctype="multipart/form-data" novalidate>
-                              <input type="hidden" name="friend_id" value="<%= friend_id %>" />
-                              <div class="message-input-container">
-                                <input type="text" name="message" class="message-input" required />
-                                <input type="file" name="file" />
-                                <button type="submit" class="send-button">Send</button>
-                              </div>
-                            </form>
-                            <% } %>
-                  </div>
-                  <div class="data-container">
-                    <h2>Data for: <%= currentFriend.friend_name %></h2>
-                  </div>
-    </div>
-    <script>
-      // Keeps scroll bar at bottom after sending message
-      function scrollToBottom() {
-        const messageContainer = document.getElementById('message-container');
-        messageContainer.scrollTop = messageContainer.scrollHeight;
-      }
-
-      document.querySelector('form').addEventListener('submit', (e) => {
-        e.preventDefault();
-        scrollToBottom();
-        setTimeout(() => {
-          e.target.submit();
-        }, 100);
-      });
-
-      window.addEventListener('DOMContentLoaded', () => {
-        scrollToBottom();
-      });
-
-
-      document.querySelectorAll(".friend").forEach((friendListItem) => {
-        friendListItem.addEventListener("click", (event) => {
-          const friendId = event.currentTarget.getAttribute("data-id");
-          window.location.href = `/messages/${friendId}`;
+        document.querySelector('form').addEventListener('submit', (e) => {
+          e.preventDefault();
+          scrollToBottom();
+          setTimeout(() => {
+            e.target.submit();
+          }, 100);
         });
-      });
 
-      function filterList(listType) {
-        const input = document.querySelector(`#${listType}-list .search-input`);
-        const filter = input.value.toUpperCase();
-        const ul = document.querySelector(`#${listType}-list ul`);
-        const li = ul.getElementsByTagName("li");
+        window.addEventListener('DOMContentLoaded', () => {
+          scrollToBottom();
+        });
 
-        for (let i = 0; i < li.length; i++) {
-          const a = li[i].getElementsByTagName("a")[0];
-          const txtValue = a.textContent || a.innerText;
 
-          if (txtValue.toUpperCase().indexOf(filter) > -1) {
-            li[i].style.display = "";
-          } else {
-            li[i].style.display = "none";
+        document.querySelectorAll(".friend").forEach((friendListItem) => {
+          friendListItem.addEventListener("click", (event) => {
+            const friendId = event.currentTarget.getAttribute("data-id");
+            window.location.href = `/messages/${friendId}`;
+          });
+        });
+
+        function filterList(listType) {
+          const input = document.querySelector(`#${listType}-list .search-input`);
+          const filter = input.value.toUpperCase();
+          const ul = document.querySelector(`#${listType}-list ul`);
+          const li = ul.getElementsByTagName("li");
+
+          for (let i = 0; i < li.length; i++) {
+            const a = li[i].getElementsByTagName("a")[0];
+            const txtValue = a.textContent || a.innerText;
+
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+              li[i].style.display = "";
+            } else {
+              li[i].style.display = "none";
+            }
           }
         }
-      }
 
-      document.getElementById('colleague-tab').addEventListener('click', function () {
-        localStorage.setItem('activeTab', 'colleague');
-        document.getElementById('colleague-tab').classList.add('active');
-        document.getElementById('coWorker-tab').classList.remove('active');
-        document.getElementById('colleague-list').classList.remove('hidden');
-        document.getElementById('coWorker-list').classList.add('hidden');
-      });
+        document.getElementById('colleague-tab').addEventListener('click', function () {
+          localStorage.setItem('activeTab', 'colleague');
+          document.getElementById('colleague-tab').classList.add('active');
+          document.getElementById('coWorker-tab').classList.remove('active');
+          document.getElementById('colleague-list').classList.remove('hidden');
+          document.getElementById('coWorker-list').classList.add('hidden');
+        });
 
-      document.getElementById('coWorker-tab').addEventListener('click', function () {
-        localStorage.setItem('activeTab', 'coWorker');
-        document.getElementById('coWorker-tab').classList.add('active');
-        document.getElementById('colleague-tab').classList.remove('active');
-        document.getElementById('coWorker-list').classList.remove('hidden');
-        document.getElementById('colleague-list').classList.add('hidden');
-      });
+        document.getElementById('coWorker-tab').addEventListener('click', function () {
+          localStorage.setItem('activeTab', 'coWorker');
+          document.getElementById('coWorker-tab').classList.add('active');
+          document.getElementById('colleague-tab').classList.remove('active');
+          document.getElementById('coWorker-list').classList.remove('hidden');
+          document.getElementById('colleague-list').classList.add('hidden');
+        });
 
-      window.addEventListener('DOMContentLoaded', () => {
-        const activeTab = localStorage.getItem('activeTab');
-        if (activeTab === 'coWorker') {
-          document.getElementById('coWorker-tab').click();
-        } else {
-          document.getElementById('colleague-tab').click();
-        }
-      });
-    </script>
+        window.addEventListener('DOMContentLoaded', () => {
+          const activeTab = localStorage.getItem('activeTab');
+          if (activeTab === 'coWorker') {
+            document.getElementById('coWorker-tab').click();
+          } else {
+            document.getElementById('colleague-tab').click();
+          }
+        });
+      </script>
+      <script src="/chart-config.js"></script>
 </body>
 
 </html>
