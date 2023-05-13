@@ -1,6 +1,7 @@
 const renewalData = [
     {
         id: 1,
+        organization: 'Company A',
         productName: 'Service: Cloud storage system',
         signOffDate: '2018-01-01',
         contractDuration: '12 months',
@@ -9,6 +10,7 @@ const renewalData = [
     },
     {
         id: 2,
+        organization: 'Company B',
         productName: 'Service: Cloud storage system',
         signOffDate: '2019-01-01',
         contractDuration: '12 months',
@@ -17,13 +19,24 @@ const renewalData = [
     },
     {
         id: 3,
+        organization: 'Company C',
         productName: 'Service: Cloud storage system',
-        signOffDate: '2020-01-01',
+        signOffDate: '2023-05-01',
         contractDuration: '12 months',
-        endDate: '2021-01-01',
-        status: 'completed',
+        endDate: '2024-05-01',
+        status: 'upcoming',
     },
+    {
+        id: 4,
+        organization: 'Company D',
+        productName: 'Service: Cloud storage system',
+        signOffDate: '2023-04-01',
+        contractDuration: '12 months',
+        endDate: '2024-04-01',
+        status: 'ongoing',
+      }      
 ];
+
 
 // Function to format the date
 function formatDate(dateString) {
@@ -33,55 +46,66 @@ function formatDate(dateString) {
 
 // Function to display renewal data
 function displayRenewals() {
-    const ongoingRenewals = document.getElementById('ongoing-renewals');
-    const upcomingRenewals = document.getElementById('upcoming-renewals');
-    const finishedRenewals = document.getElementById('finished-renewals');
+    const ongoingRenewals = document.getElementById('ongoing-renewals-body');
+    const upcomingRenewals = document.getElementById('upcoming-renewals-body');
+    const finishedRenewals = document.getElementById('finished-renewals-body');
     const activityTableBody = document.getElementById('activity-table-body');
-
+  
     const today = new Date().toISOString().split('T')[0];
-
+  
     renewalData.forEach((renewal) => {
-        const renewalItem = document.createElement('p');
-        renewalItem.textContent = `${renewal.productName} - ${renewal.contractDuration}`;
-
-        if (renewal.signOffDate <= today && renewal.endDate >= today) {
-            ongoingRenewals.appendChild(renewalItem);
-        } else if (renewal.signOffDate > today) {
-            upcomingRenewals.appendChild(renewalItem);
-        } else if (renewal.endDate < today) {
-            finishedRenewals.appendChild(renewalItem);
-        }
-
-        // Update activity table
-        const tableRow = document.createElement('tr');
-
-        const activityName = document.createElement('td');
-        activityName.textContent = renewal.productName;
-        tableRow.appendChild(activityName);
-
-        const details = document.createElement('td');
-        details.textContent = `${renewal.contractDuration}`;
-        tableRow.appendChild(details);
-
-        const startDate = document.createElement('td');
-        startDate.textContent = formatDate(renewal.signOffDate);
-        tableRow.appendChild(startDate);
-
-        const status = document.createElement('td');
-        status.textContent = renewal.status;
-        tableRow.appendChild(status);
-
-        const link = document.createElement('td');
-        const linkElement = document.createElement('a');
-        linkElement.textContent = 'Link';
-        linkElement.href = `localhost:3000/messages/${renewal.id}`;
-        link.appendChild(linkElement);
-        tableRow.appendChild(link);
-
-        activityTableBody.appendChild(tableRow);
+      const tableRow = document.createElement('tr');
+  
+      const orgCell = document.createElement('td');
+      orgCell.textContent = `Organization: ${renewal.organization}`;
+      tableRow.appendChild(orgCell);
+  
+      const productNameCell = document.createElement('td');
+      productNameCell.textContent = `Renewal: ${renewal.productName}`;
+      tableRow.appendChild(productNameCell);
+  
+      const linkCell = document.createElement('td');
+      const linkElement = document.createElement('a');
+      linkElement.textContent = 'Link';
+      linkElement.href = `http://localhost:3000/messages/${renewal.id}`;
+      linkElement.classList.add('renewal-link');
+      linkCell.appendChild(linkElement);
+      tableRow.appendChild(linkCell);
+  
+      if (renewal.status === 'ongoing') {
+        ongoingRenewals.appendChild(tableRow.cloneNode(true));
+      } else if (renewal.status === 'upcoming') {
+        upcomingRenewals.appendChild(tableRow.cloneNode(true));
+      } else if (renewal.status === 'completed') {
+        finishedRenewals.appendChild(tableRow.cloneNode(true));
+      }
+  
+      // Update activity table
+      const activityTableRow = document.createElement('tr');
+  
+      const activityTableCellName = document.createElement('td');
+      activityTableCellName.textContent = `${renewal.organization} - ${renewal.productName}`;
+      activityTableRow.appendChild(activityTableCellName);
+  
+      const details = document.createElement('td');
+      details.textContent = `${renewal.contractDuration}`;
+      activityTableRow.appendChild(details);
+  
+      const activityTableCellStartDate = document.createElement('td');
+      activityTableCellStartDate.textContent = formatDate(renewal.signOffDate);
+      activityTableRow.appendChild(activityTableCellStartDate);
+  
+      const status = document.createElement('td');
+      status.textContent = renewal.status;
+      activityTableRow.appendChild(status);
+  
+      const activityTableCellLink = document.createElement('td');
+      activityTableCellLink.appendChild(linkElement.cloneNode(true));
+      activityTableRow.appendChild(activityTableCellLink);
+  
+      activityTableBody.appendChild(activityTableRow);
     });
-
-}
-
-// Call the displayRenewals function to update the dashboard
-displayRenewals();
+  }
+  
+  // Call the displayRenewals function to update the dashboard
+  displayRenewals();

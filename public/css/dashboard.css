@@ -157,13 +157,27 @@ a:hover {
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 28%;
+  width: 40%;
   margin: 0 2%;
 }
 
 .renewal-container h2 {
   margin-bottom: 5px;
 }
+
+.renewal-link {
+  color: #007bff;
+  text-decoration: none;
+  background-color: transparent;
+  cursor: pointer;
+  font-size: 14px; /* adjust this value to your liking */
+}
+
+.renewal-link:hover {
+  background-color: #0056b3;
+  text-decoration: none;
+}
+
 
 .renewal-box {
   width: 300px;

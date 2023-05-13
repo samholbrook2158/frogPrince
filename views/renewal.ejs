@@ -1,19 +1,73 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About Us</title>
-    <link rel="stylesheet" href="/css/about.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Renewal</title>
+    <link rel="stylesheet" href="/css/renewal.css" />
 </head>
 
 <body>
+    <%- include('./partials/navbar') %>
+        <div class="content-wrapper">
+            <h2>Add New Renewal</h2>
+            <div class="search-container">
+                <input type="text" id="search-external" placeholder="Search external contacts"
+                    onkeyup="filterList('external')" />
+                    <ul id="external-list" class="user-list">
+                        <% externals.forEach(function(external) { %>
+                          <li class="user" data-friendship-id="<%= external.friend_id %>">
+                            <a href="#">
+                              <%= external.friend_name %>
+                            </a>
+                          </li>
+                        <% }) %>
+                      </ul>                      
+                      
+                <form action="/renewal" method="POST">
+                    <input type="hidden" id="friendship_id" name="friendship_id" />
 
-    <body>
-        <%- include('./partials/navbar') %>
-        <h1 class="welcome-message">About Us</h1>
-        <p>Welcome to our About Us page. Here you can learn more about our team and our mission.</p>
-    </body>
+                    <label for="product_name">Product Name:</label>
+                    <input type="text" id="product_name" name="product_name" required />
+
+                    <label for="start_date">Start Date:</label>
+                    <input type="date" id="start_date" name="start_date" required />
+
+                    <label for="end_date">End Date:</label>
+                    <input type="date" id="end_date" name="end_date" required />
+
+                    <label for="details">Details:</label>
+                    <input type="text" id="details" name="details" required />
+
+                    <label for="status">Status:</label>
+                    <input type="text" id="status" name="status" required />
+
+                    <input type="submit" value="Submit" />
+                </form>
+
+            </div>
+            <script>
+                function filterList(userType) {
+                    // your existing code here...
+                }
+            
+                function addClickListenersToUsers() {
+                    document.querySelectorAll('.user').forEach((userListItem) => {
+                        userListItem.addEventListener('click', (event) => {
+                            event.preventDefault();
+                            const friendshipId = event.target.closest('.user').getAttribute('data-friendship-id');
+                            console.log('Friendship ID: ', friendshipId); // Add this line
+                            document.getElementById('friendship_id').value = friendshipId;
+                        });
+                    });
+                }
+            
+                // Call this function whenever your `externals` data is updated
+                addClickListenersToUsers();
+            </script>
+            
+
+</body>
 
 </html>

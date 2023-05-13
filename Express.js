@@ -86,16 +86,16 @@ router.get("/about", function (req, res) {
     }
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
-    
-  res.render("about", {
-    totalUnreadMessages: totalUnreadMessages
+
+    res.render("about", {
+      totalUnreadMessages: totalUnreadMessages
+    });
   });
-});
 });
 
 router.get("/FAQ", function (req, res) {
   const user_id = req.cookies.user_id;
-  
+
   getUnreadCounts(user_id, function (err, unreadCounts) {
     if (err) {
       console.error("Error fetching unread counts:", err);
@@ -104,41 +104,53 @@ router.get("/FAQ", function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  res.render("FAQ", {
-    totalUnreadMessages: totalUnreadMessages
+    res.render("FAQ", {
+      totalUnreadMessages: totalUnreadMessages
+    });
   });
-});
 });
 
 router.get("/messages", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
-  connection.query(
-    "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
-    [user_id, "accepted"],
-    function (err, friends, fields) {
-      if (err) throw err;
-
-      const colleagueFriends = friends.filter(friend => friend.is_colleague === 1);
-      const clientFriends = friends.filter(friend => friend.is_colleague !== 1);
-
-      if (colleagueFriends.length > 0) {
-        const firstFriendId = colleagueFriends[0].friend_id;
-        res.redirect(`/messages/${firstFriendId}`);
-      } else if (clientFriends.length > 0) {
-        const firstFriendId = clientFriends[0].friend_id;
-        res.redirect(`/messages/${firstFriendId}`);
-      } else {
-        res.render("messages", {
-          messages: [],
-          user_id: user_id,
-          friend_id: null,
-          friends: friends,
-        });
-      }
+  getUnreadCounts(user_id, function (err, unreadCounts) {
+    if (err) {
+      console.error("Error fetching unread counts:", err);
+      return res.status(500).send("Failed to fetch unread counts");
     }
-  );
+    
+    connection.query(
+      "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ?",
+      [user_id, "accepted"],
+      function (err, friends, fields) {
+        if (err) throw err;
+  
+        const colleagueFriends = friends.filter(friend => friend.is_colleague === 1);
+        const clientFriends = friends.filter(friend => friend.is_colleague !== 1);
+        const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+  
+        if (colleagueFriends.length > 0) {
+          const firstFriendId = colleagueFriends[0].friend_id;
+          res.redirect(`/messages/${firstFriendId}`);
+        } else if (clientFriends.length > 0) {
+          const firstFriendId = clientFriends[0].friend_id;
+          res.redirect(`/messages/${firstFriendId}`);
+        } else {
+          res.render("messages", {
+            messages: [],
+            user_id: user_id,
+            friend_id: null,
+            friends: friends,
+            colleagueUnreadCount: unreadCounts.colleagueUnreadCount,
+            clientUnreadCount: unreadCounts.clientUnreadCount,
+            totalUnreadMessages: totalUnreadMessages,
+          });
+        }
+      }
+    );
+  });
 });
+
 
 router.post("/messages", checkAuth, upload.single('file'), function (req, res) {
   const user_id = req.cookies.user_id;
@@ -363,23 +375,23 @@ router.post("/friends/search", checkAuth, function (req, res) {
                   console.error("Error fetching unread counts:", err);
                   return res.status(500).send("Failed to fetch unread counts");
                 }
-            
-              const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-              res.render("friends", {
-                friends: friends,
-                requests: requests,
-                searchResults: searchResults,
-                error: "",
-                totalUnreadMessages: totalUnreadMessages
-              });
+                const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+                res.render("friends", {
+                  friends: friends,
+                  requests: requests,
+                  searchResults: searchResults,
+                  error: "",
+                  totalUnreadMessages: totalUnreadMessages
+                });
+              }
+              );
             }
           );
         }
       );
-    }
-  );
-  });
+    });
 });
 
 router.post("/friends/send-request", checkAuth, function (req, res) {
@@ -394,43 +406,43 @@ router.post("/friends/send-request", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  connection.query(
-    "SELECT * FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
-    [user_id, friend_id, friend_id, user_id],
-    function (err, results) {
-      if (err) throw err;
+    connection.query(
+      "SELECT * FROM friendships WHERE (user_id = ? AND friend_id = ?) OR (user_id = ? AND friend_id = ?)",
+      [user_id, friend_id, friend_id, user_id],
+      function (err, results) {
+        if (err) throw err;
 
-      if (results.length > 0) {
-        res.render("friends", {
-          error: "A friend request is already pending.",
-          friends: [],
-          requests: [],
-          searchResults: [],
-          totalUnreadMessages: totalUnreadMessages
-        });
-      } else {
-        connection.query(
-          "SELECT organization FROM users WHERE id IN (?, ?)",
-          [user_id, friend_id],
-          function (err, organizations, fields) {
-            if (err) throw err;
+        if (results.length > 0) {
+          res.render("friends", {
+            error: "A friend request is already pending.",
+            friends: [],
+            requests: [],
+            searchResults: [],
+            totalUnreadMessages: totalUnreadMessages
+          });
+        } else {
+          connection.query(
+            "SELECT organization FROM users WHERE id IN (?, ?)",
+            [user_id, friend_id],
+            function (err, organizations, fields) {
+              if (err) throw err;
 
-            const is_colleague = organizations[0].organization === organizations[1].organization ? 1 : 0;
+              const is_colleague = organizations[0].organization === organizations[1].organization ? 1 : 0;
 
-            connection.query(
-              "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
-              [user_id, friend_id, "pending", is_colleague],
-              function (err, result) {
-                if (err) throw err;
+              connection.query(
+                "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
+                [user_id, friend_id, "pending", is_colleague],
+                function (err, result) {
+                  if (err) throw err;
 
-                res.redirect("/friends");
-              }
-            );
-          }
-        );
+                  res.redirect("/friends");
+                }
+              );
+            }
+          );
+        }
       }
-    }
-  );
+    );
   });
 });
 
@@ -446,32 +458,32 @@ router.post("/friends/accept-request", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  connection.query(
-    "SELECT is_colleague FROM friendships WHERE user_id = ? AND friend_id = ?",
-    [request_id, user_id],
-    function (err, result) {
-      if (err) throw err;
-      const is_colleague = result[0].is_colleague;
+    connection.query(
+      "SELECT is_colleague FROM friendships WHERE user_id = ? AND friend_id = ?",
+      [request_id, user_id],
+      function (err, result) {
+        if (err) throw err;
+        const is_colleague = result[0].is_colleague;
 
-      connection.query(
-        "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
-        ["accepted", request_id, user_id],
-        function (err, result) {
-          if (err) throw err;
+        connection.query(
+          "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
+          ["accepted", request_id, user_id],
+          function (err, result) {
+            if (err) throw err;
 
-          connection.query(
-            "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
-            [user_id, request_id, "accepted", is_colleague],
-            function (err, result) {
-              if (err) throw err;
+            connection.query(
+              "INSERT INTO friendships (user_id, friend_id, status, is_colleague) VALUES (?, ?, ?, ?)",
+              [user_id, request_id, "accepted", is_colleague],
+              function (err, result) {
+                if (err) throw err;
 
-              res.redirect("/friends");
-            }
-          );
-        }
-      );
-    }
-  );
+                res.redirect("/friends");
+              }
+            );
+          }
+        );
+      }
+    );
   });
 });
 
@@ -487,15 +499,15 @@ router.post("/friends/decline-request", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  connection.query(
-    "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
-    ["declined", request_id, user_id],
-    function (err, result) {
-      if (err) throw err;
+    connection.query(
+      "UPDATE friendships SET status = ? WHERE user_id = ? AND friend_id = ?",
+      ["declined", request_id, user_id],
+      function (err, result) {
+        if (err) throw err;
 
-      res.redirect("/friends");
-    }
-  );
+        res.redirect("/friends");
+      }
+    );
   });
 });
 
@@ -511,17 +523,17 @@ router.get("/account", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  connection.query(
-    "SELECT * FROM users WHERE id = ?",
-    [user_id],
-    function (err, rows, fields) {
-      if (err) throw err;
+    connection.query(
+      "SELECT * FROM users WHERE id = ?",
+      [user_id],
+      function (err, rows, fields) {
+        if (err) throw err;
 
-      const user = rows[0];
+        const user = rows[0];
 
-      res.render("account", { user: user, editing: editing, totalUnreadMessages: totalUnreadMessages });
-    }
-  );
+        res.render("account", { user: user, editing: editing, totalUnreadMessages: totalUnreadMessages });
+      }
+    );
   });
 });
 
@@ -537,29 +549,29 @@ router.post("/delete-account", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  // Delete friendships
-  connection.query(
-    "DELETE FROM friendships WHERE user_id = ? OR friend_id = ?",
-    [user_id, user_id],
-    function (err, result) {
-      if (err) throw err;
+    // Delete friendships
+    connection.query(
+      "DELETE FROM friendships WHERE user_id = ? OR friend_id = ?",
+      [user_id, user_id],
+      function (err, result) {
+        if (err) throw err;
 
-      // Delete user
-      connection.query(
-        "DELETE FROM users WHERE id = ?",
-        [user_id],
-        function (err, result) {
-          if (err) throw err;
+        // Delete user
+        connection.query(
+          "DELETE FROM users WHERE id = ?",
+          [user_id],
+          function (err, result) {
+            if (err) throw err;
 
-          // Clear user_id cookie
-          res.clearCookie("user_id");
+            // Clear user_id cookie
+            res.clearCookie("user_id");
 
-          // Redirect to login page
-          res.redirect("/login");
-        }
-      );
-    }
-  );
+            // Redirect to login page
+            res.redirect("/login");
+          }
+        );
+      }
+    );
   });
 });
 
@@ -575,33 +587,72 @@ router.post("/edit-account", checkAuth, function (req, res) {
 
     const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-  connection.query(
-    "UPDATE users SET username = ?, email = ?, organization = ?, role = ? WHERE id = ?",
-    [username, email, organization, role, user_id],
-    function (err, result) {
-      if (err) throw err;
+    connection.query(
+      "UPDATE users SET username = ?, email = ?, organization = ?, role = ? WHERE id = ?",
+      [username, email, organization, role, user_id],
+      function (err, result) {
+        if (err) throw err;
 
-      // Redirect back to account page
-      res.redirect("/account");
-    }
-  );
+        // Redirect back to account page
+        res.redirect("/account");
+      }
+    );
   });
 });
 
-router.get("/renewal", function (req, res) {
+router.get("/renewal", checkAuth, function (req, res) {
   const user_id = req.cookies.user_id;
 
-  getUnreadCounts(user_id, function (err, unreadCounts) {
-    if (err) {
-      console.error("Error fetching unread counts:", err);
-      return res.status(500).send("Failed to fetch unread counts");
-    }
-    const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+  // Fetch external contacts
+  connection.query(
+    "SELECT users.id as friend_id, users.username as friend_name, friendships.is_colleague FROM friendships JOIN users ON friendships.friend_id = users.id WHERE friendships.user_id = ? AND friendships.status = ? AND friendships.is_colleague = 0 GROUP BY users.id, friendships.is_colleague",
+    [user_id, "accepted"],
+    function (err, externals) {
+      if (err) {
+        console.error("Error fetching external contacts:", err);
+        return res.status(500).send("Failed to fetch external contacts");
+      }
 
-  res.render("renewal", {
-    totalUnreadMessages: totalUnreadMessages
-  });
+      console.log(externals); // Add this line
+
+      getUnreadCounts(user_id, function (err, unreadCounts) {
+        if (err) {
+          console.error("Error fetching unread counts:", err);
+          return res.status(500).send("Failed to fetch unread counts");
+        }
+
+        const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
+
+        res.render("renewal", {
+          externals: externals,
+          totalUnreadMessages: totalUnreadMessages,
+        });
+      });
+    }
+  );
 });
+
+router.post("/renewal", checkAuth, function (req, res) {
+  const friendship_id = req.body.friendship_id !== '' ? req.body.friendship_id : null;
+  const product_name = req.body.product_name;
+  const start_date = req.body.start_date;
+  const end_date = req.body.end_date;
+  const details = req.body.details;
+  const status = req.body.status;
+
+  // Insert renewal into the database
+  connection.query(
+    "INSERT INTO renewals (friendship_id, product_name, start_date, end_date, details, status) VALUES (?, ?, ?, ?, ?, ?)",
+    [friendship_id, product_name, start_date, end_date, details, status],
+    function (err, result) {
+      if (err) {
+        console.error("Error creating renewal:", err);
+        return res.status(500).send("Failed to create renewal");
+      }
+      res.redirect("/renewal");
+    }
+  );
 });
+
 
 module.exports = router;
