@@ -41,6 +41,11 @@
 
         <button type="submit">Signup</button>
       </form>
+      <div class="container">
+        <form method="GET" action="/login">
+          <button type="button" class="cancel-button" onclick="window.location.href='/login'">Cancel</button>
+        </form>
+      </div>
     </div>
     <% if (typeof success !== 'undefined' && success) { %>
     <div class="success"><%= success %></div>

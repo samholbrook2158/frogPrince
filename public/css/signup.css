@@ -120,14 +120,33 @@ button[type="submit"].login-button:hover {
 }
 
 button[type="submit"].signup-button {
-  background-color: #2196F3;
+  background-color: #4CAF50;
   color: #fff;
 }
 
 button[type="submit"].signup-button:hover {
-  background-color: #0c7cd5;
+  background-color: #8e3e3f;
 }
 
+button[type="button"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="button"].cancel-button {
+  background-color: #be2539;
+  color: #fff;
+}
+
+button[type="button"].cancel-button:hover {
+  background-color: #92282d;
+}
 
 /* Error message styling */
 #error-container {

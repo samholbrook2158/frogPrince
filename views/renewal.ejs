@@ -10,20 +10,19 @@
 
 <body>
   <%- include('./partials/navbar') %>
-    <div class="content-wrapper">
-      <h2>Add New Renewal</h2>
-      <div class="search-container">
-        <input type="text" id="search-external" placeholder="Search external contacts"
-          onkeyup="filterList('external')" />
-        <ul id="external-list" class="user-list">
-          <% externals.forEach(function(external) { %>
-            <li class="user" data-user-id="<%= external.friend_id %>">
-              <a href="#">
-                <%= external.friend_name %>
-              </a>
-            </li>
-            <% }) %>
-        </ul>
+  <div class="content-wrapper">
+    <h2>Create New Renewal Process</h2>
+    <div class="search-container">
+      <input type="text" id="search-external" placeholder="Search external contacts" onkeyup="filterList('external')" />
+      <ul id="external-list" class="user-list">
+        <% externals.forEach(function(external) { %>
+          <li class="user" data-user-id="<%= external.friend_id %>">
+            <a href="#">
+              <%= external.friend_name %>
+            </a>
+          </li>
+        <% }) %>
+      </ul>
 
         <form action="/renewal" method="POST">
           <input type="hidden" id="user_id" name="user_id" />
@@ -71,13 +70,21 @@
             userListItem.addEventListener('click', (event) => {
               event.preventDefault();
               const friendId = event.currentTarget.getAttribute('data-user-id');
+      
+              // Remove the previous selected class from all users
+              document.querySelectorAll('.user').forEach((user) => {
+                user.classList.remove('selected');
+              });
+      
+              // Add the selected class to the clicked user
+              event.currentTarget.classList.add('selected');
+      
               document.getElementById('friend_id').value = friendId;
             });
           });
         }
         addClickListenersToUsers();
       </script>
-
 </body>
 
 </html>
