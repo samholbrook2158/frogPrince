@@ -133,7 +133,9 @@
       </div>
       <script src="/chart.js"></script>
       <script>
+        let renewalData;
         const renewals = <%- JSON.stringify(renewals) %>;
+
         // Keeps scroll bar at bottom after sending message
         function scrollToBottom() {
           const messageContainer = document.getElementById('message-container');
@@ -159,6 +161,7 @@
             window.location.href = `/messages/${friendId}`;
           });
         });
+        
 
         function filterList(listType) {
           const input = document.querySelector(`#${listType}-list .search-input`);

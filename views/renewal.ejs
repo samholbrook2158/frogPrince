@@ -53,8 +53,13 @@
           <label for="consulting_hours">Consulting Hours</label>
           <input type="number" class="form-control" id="consulting_hours" name="consulting_hours" required>
 
-          <label for="status">Status:</label>
-          <input type="text" id="status" name="status" required />
+          <select name="status" required>
+            <option value="">Select a Status...</option>
+            <option value="Ongoing">Ongoing</option>
+            <option value="Upcoming">Upcoming</option>
+            <option value="Completed">Finished</option>
+          </select>
+          
 
           <input type="submit" value="Submit" />
         </form>
