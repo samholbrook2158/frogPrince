@@ -48,8 +48,8 @@ a {
 }
 
 a:hover {
-  background-color: transparent; /* No color change on hover */
-  color: #333; /* Keep the same color on hover */
+  background-color: transparent;
+  color: #333; 
 }
 
 a.message-button {
@@ -204,7 +204,7 @@ a.message-button {
   width: 100%;
   font-size: 12px;
   border-collapse: collapse;
-  border: 2px solid #333; /* add border property */
+  border: 2px solid #333; 
 }
 
 .activity-section th,
@@ -223,7 +223,7 @@ a.message-button {
 
 
 .table-wrapper {
-  height: calc(3 * (2.2em + 12px) + (2.2em + 12px) + 1px); /* Fits 3 rows and table header (based on the line-height, padding, and border values in your CSS) */
+  height: calc(3 * (2.2em + 12px) + (2.2em + 12px) + 1px);
   overflow-y: auto;
   display: inline-block;
   width: 100%;

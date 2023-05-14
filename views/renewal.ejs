@@ -70,13 +70,11 @@
             userListItem.addEventListener('click', (event) => {
               event.preventDefault();
               const friendId = event.currentTarget.getAttribute('data-user-id');
-      
-              // Remove the previous selected class from all users
+   
               document.querySelectorAll('.user').forEach((user) => {
                 user.classList.remove('selected');
               });
       
-              // Add the selected class to the clicked user
               event.currentTarget.classList.add('selected');
       
               document.getElementById('friend_id').value = friendId;

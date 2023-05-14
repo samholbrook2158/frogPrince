@@ -661,8 +661,8 @@ router.post("/delete-account", checkAuth, function (req, res) {
       const status = req.body.status;
       const price = Number(req.body.price);
       const renewal_date = req.body.renewal_date;
-      const contract_duration = req.body.contract_duration;  // new field
-      const consulting_hours = Number(req.body.consulting_hours);  // new field
+      const contract_duration = req.body.contract_duration;  
+      const consulting_hours = Number(req.body.consulting_hours);  
 
       // Insert renewal into the database
       connection.query(

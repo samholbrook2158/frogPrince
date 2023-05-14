@@ -14,7 +14,6 @@ function displayRenewals() {
   const finishedRenewals = document.getElementById('finished-renewals-body');
   const activityTableBody = document.getElementById('activity-table-body');
 
-  // Clear the existing content
   ongoingRenewals.innerHTML = '';
   upcomingRenewals.innerHTML = '';
   finishedRenewals.innerHTML = '';
@@ -47,7 +46,6 @@ function displayRenewals() {
       finishedRenewals.appendChild(tableRow);
     }
 
-    // Update activity table
     const activityTableRow = document.createElement('tr');
 
     const activityTableCellName = document.createElement('td');
