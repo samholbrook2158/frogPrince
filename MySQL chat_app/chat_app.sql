@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 14, 2023 at 09:46 AM
+-- Generation Time: May 14, 2023 at 09:49 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -42,9 +42,7 @@ CREATE TABLE `friendships` (
 INSERT INTO `friendships` (`id`, `user_id`, `friend_id`, `status`, `is_colleague`) VALUES
 (14, 8, 4, 'accepted', 1),
 (15, 4, 8, 'accepted', 1),
-(20, 4, 10, 'pending', 1),
-(21, 4, 5, 'accepted', 0),
-(23, 5, 4, 'accepted', 0);
+(20, 4, 10, 'pending', 1);
 
 -- --------------------------------------------------------
 
@@ -102,8 +100,7 @@ CREATE TABLE `renewals` (
 
 INSERT INTO `renewals` (`id`, `product_name`, `start_date`, `end_date`, `details`, `status`, `user_id`, `friend_id`, `price`, `renewal_date`, `contract_duration`, `consulting_hours`) VALUES
 (28, 'Test', '2023-05-02', '2023-05-18', 'Test', 'Ongoing', 4, 5, 12000.00, '2023-05-01', '12 Months', 12),
-(29, 'test', '2023-05-01', '2023-05-11', 'Test', 'Upcoming', 4, 5, 1200000.00, '2023-05-10', '12 Months', 12),
-(30, 'Sam', '2023-05-21', '2023-05-28', 'Test', 'Upcoming', 12, 4, 500000.00, '2023-05-16', '2 weeks', 2);
+(29, 'test', '2023-05-01', '2023-05-11', 'Test', 'Upcoming', 4, 5, 1200000.00, '2023-05-10', '12 Months', 12);
 
 -- --------------------------------------------------------
 
@@ -126,10 +123,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`, `Email`, `organization`, `role`) VALUES
 (4, 'demo', 'demo', 'demo', 'demo', 'Solutions consultant'),
-(5, 'uwe', 'uwe', 'uwe@uwe.com', 'uwe', 'uwe'),
 (8, 'demo5', 'demo', 'demo5@demo5', 'demo', 'Sales manager'),
-(10, 'John-Appleseed', 'John', 'John@Appleseed.com', 'demo', 'HR Manager'),
-(12, 'sam', 'sam', 'sam@gmail.com', 'sam', 'Solutions consultant');
+(10, 'John-Appleseed', 'John', 'John@Appleseed.com', 'demo', 'HR Manager');
 
 --
 -- Indexes for dumped tables
@@ -154,7 +149,7 @@ ALTER TABLE `friend_chats`
 --
 ALTER TABLE `renewals`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `renewals_user_id_fk` (`user_id`);
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `users`
@@ -205,7 +200,7 @@ ALTER TABLE `friendships`
 -- Constraints for table `renewals`
 --
 ALTER TABLE `renewals`
-  ADD CONSTRAINT `renewals_user_id_fk` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
+  ADD CONSTRAINT `renewals_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
