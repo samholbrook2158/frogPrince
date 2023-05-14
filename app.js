@@ -32,7 +32,7 @@ app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.get('/logout', function(req, res) {
+app.get('/logout', function (req, res) {
     res.clearCookie('user_id');
     res.redirect('/login');
 });
@@ -89,7 +89,7 @@ app.post('/signup', function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
     var organization = req.body.organization;
-    var role = req.body.role || null; 
+    var role = req.body.role || null;
 
     console.log("Role entered:", role); // add this line to log the role
 
@@ -106,44 +106,44 @@ app.post('/signup', function (req, res) {
                 'INSERT INTO users (username, email, password, organization, role) VALUES (?, ?, ?, ?, ?)',
                 [username, email, password, organization, role],
                 function (err, result) {
-                  if (err) {
-                    console.error(err);
-                    res.render('signup', { error: 'Error occurred while processing the request.' });
-                  } else {
-                    res.render('signup', { success: 'Account created successfully. Please log in.' });
-                  }
+                    if (err) {
+                        console.error(err);
+                        res.render('signup', { error: 'Error occurred while processing the request.' });
+                    } else {
+                        res.render('signup', { success: 'Account created successfully. Please log in.' });
+                    }
                 }
-              );              
+            );
         }
     });
 });
 
 function getUnreadCounts(user_id, callback) {
     db.query(
-      "SELECT friendships.is_colleague, COUNT(*) as unread_count FROM friendships JOIN friend_chats ON friendships.friend_id = friend_chats.sender_id WHERE friendships.user_id = ? AND friend_chats.receiver_id = ? AND friend_chats.is_read = 0 GROUP BY friendships.is_colleague",
-      [user_id, user_id],
-      function (err, rows) {
-        if (err) {
-          console.error("Error fetching unread counts:", err);
-          callback(err, null);
-        } else {
-          let colleagueUnreadCount = 0;
-          let clientUnreadCount = 0;
-  
-          rows.forEach(row => {
-            if (row.is_colleague === 1) {
-              colleagueUnreadCount = row.unread_count;
+        "SELECT friendships.is_colleague, COUNT(*) as unread_count FROM friendships JOIN friend_chats ON friendships.friend_id = friend_chats.sender_id WHERE friendships.user_id = ? AND friend_chats.receiver_id = ? AND friend_chats.is_read = 0 GROUP BY friendships.is_colleague",
+        [user_id, user_id],
+        function (err, rows) {
+            if (err) {
+                console.error("Error fetching unread counts:", err);
+                callback(err, null);
             } else {
-              clientUnreadCount = row.unread_count;
+                let colleagueUnreadCount = 0;
+                let clientUnreadCount = 0;
+
+                rows.forEach(row => {
+                    if (row.is_colleague === 1) {
+                        colleagueUnreadCount = row.unread_count;
+                    } else {
+                        clientUnreadCount = row.unread_count;
+                    }
+                });
+
+                callback(null, {
+                    colleagueUnreadCount: colleagueUnreadCount,
+                    clientUnreadCount: clientUnreadCount,
+                });
             }
-          });
-  
-          callback(null, {
-            colleagueUnreadCount: colleagueUnreadCount,
-            clientUnreadCount: clientUnreadCount,
-          });
         }
-      }
     );
 }
 
@@ -152,29 +152,51 @@ app.get("/dashboard", function (req, res) {
 
     getUnreadCounts(user_id, function (err, unreadCounts) {
         if (err) {
-          console.error("Error fetching unread counts:", err);
-          return res.status(500).send("Failed to fetch unread counts");
+            console.error("Error fetching unread counts:", err);
+            return res.status(500).send("Failed to fetch unread counts");
         }
-    
+
         const totalUnreadMessages = unreadCounts.colleagueUnreadCount + unreadCounts.clientUnreadCount;
 
-    if (!user_id) {
-        return res.redirect("/login");
-    }
-
-    db.query("SELECT username FROM users WHERE id = ?", [user_id], function (err, results) {
-        if (err || results.length === 0) {
-            res.redirect("/login");
-        } else {
-            var username = results[0].username;
-            res.render("dashboard", { 
-            username: username,
-            totalUnreadMessages: totalUnreadMessages 
-        });
+        if (!user_id) {
+            return res.redirect("/login");
         }
+
+        db.query(`
+            SELECT users.username, users.organization, renewals.product_name, renewals.start_date, renewals.contract_duration, renewals.end_date, renewals.status, renewals.friend_id
+            FROM users 
+            LEFT JOIN renewals ON users.id = renewals.user_id
+            WHERE users.id = ?`,
+            [user_id],
+            function (err, results) {
+                if (err || results.length === 0) {
+                    res.redirect("/login");
+                } else {
+                    var username = results[0].username;
+                    var organization = results[0].organization;
+                    var renewals = results.map(result => {
+                        return {
+                            product_name: result.product_name,
+                            start_date: result.start_date,
+                            contract_duration: result.contract_duration,
+                            end_date: result.end_date,
+                            status: result.status,
+                            friend_id: result.friend_id,
+                        };
+                    });
+
+                    res.render("dashboard", {
+                        username: username,
+                        organization: organization,
+                        renewals: renewals,
+                        totalUnreadMessages: totalUnreadMessages
+                    });
+                }
+            }
+        );
     });
 });
-});
+
 
 // Mounts the Express.js middleware
 app.use("/", ExpressApp);

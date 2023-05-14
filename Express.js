@@ -227,10 +227,8 @@ router.get("/messages/:friend_id", checkAuth, function (req, res) {
           function (err, friends, fields) {
             if (err) throw err;
 
-            connection.query("SELECT renewals.* FROM renewals JOIN friendships ON renewals.user_id = friendships.user_id AND renewals.friend_id = friendships.friend_id WHERE friendships.user_id = ?", [user_id], function (err, renewals) {
-
-
-
+            connection.query("SELECT renewals.* FROM renewals JOIN friendships ON renewals.user_id = friendships.user_id AND renewals.friend_id = friendships.friend_id WHERE friendships.user_id = ?", 
+            [user_id], function (err, renewals) {
 
                 connection.query(
                   "SELECT friend_chats.*, users.username as sender FROM friend_chats JOIN users ON friend_chats.sender_id = users.id WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp ASC",

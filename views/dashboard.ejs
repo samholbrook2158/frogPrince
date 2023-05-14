@@ -10,7 +10,7 @@
 
 <body>
   <%- include('./partials/navbar') %>
-
+  
     <!-- Main content -->
     <main>
       <h1 class="welcome-message">frogPrince Dashboard</h1>
@@ -60,12 +60,7 @@
     </main>
 
     <script>
-      function toggleMenu() {
-        const dropdown = document.querySelector(".dropdown");
-        const hamburger = document.querySelector(".hamburger");
-        dropdown.classList.toggle("active");
-        hamburger.classList.toggle("active");
-      }
+      var renewals = <%- JSON.stringify(renewals) %>;
     </script>
     <script src="/dashboard.js"></script>
 </body>
