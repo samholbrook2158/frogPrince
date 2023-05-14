@@ -115,7 +115,7 @@ a.message-button {
 
 a:hover {
   background-color: #333;
-  color: white;
+  color: rgb(27, 20, 20);
 }
 
 .chat-wrapper {
@@ -296,7 +296,7 @@ a:hover {
 }
 
 .list-wrapper a:hover {
-  background-color: #f0f0f0;
+  background-color: #050505;
   border-color: #999;
   text-decoration: underline;
 }

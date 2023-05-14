@@ -53,7 +53,7 @@
             </div>
           </div>
           <div class="list-wrapper hidden" id="coWorker-list">
-            <input type="text" class="search-input" placeholder="Search clients" onkeyup="filterList('coWorker')" />
+            <input type="text" class="search-input" placeholder="Search external contacts" onkeyup="filterList('coWorker')" />
             <div class="list-box">
               <ul>
                 <!-- Client list -->
@@ -131,7 +131,9 @@
                       </div>
                     </div>
       </div>
+      <script src="/chart.js"></script>
       <script>
+        const renewals = <%- JSON.stringify(renewals) %>;
         // Keeps scroll bar at bottom after sending message
         function scrollToBottom() {
           const messageContainer = document.getElementById('message-container');
@@ -201,7 +203,6 @@
           }
         });
       </script>
-      <script src="/chart-config.js"></script>
 </body>
 
 </html>

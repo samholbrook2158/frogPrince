@@ -1,30 +1,17 @@
-const renewalData = [
-    {
-      year: '2018',
-      price: 1000,
-      productName: 'Service: Cloud storage system',
-      signOffDate: '2018-01-01',
-      contractDuration: '12 months',
-      consultingHours: 20
-    },
-    {
-      year: '2019',
-      price: 1100,
-      productName: 'Service: Cloud storage system',
-      signOffDate: '2019-01-01',
-      contractDuration: '12 months',
-      consultingHours: 25
-    },
-    {
-      year: '2020',
-      price: 1200,
-      productName: 'Service: Cloud storage system',
-      signOffDate: '2020-01-01',
-      contractDuration: '12 months',
-      consultingHours: 30
-    }
-  ];
-  
+window.addEventListener('DOMContentLoaded', (event) => {
+  const renewalData = renewals.map((renewal) => {
+    return {
+      year: renewal.start_date.substring(0, 4), 
+      price: renewal.price,
+      productName: renewal.product_name,  
+      startDate: renewal.start_date.split('T')[0],
+      signOffDate: renewal.end_date.split('T')[0],  
+      contractDuration: renewal.contract_duration,
+      consultingHours: renewal.consulting_hours
+    };
+});
+
+
   const chartData = {
     labels: renewalData.map((data) => data.year),
     datasets: [
@@ -44,8 +31,10 @@ const renewalData = [
       },
     ],
   };
-  
+
   const ctx = document.getElementById('renewal-chart').getContext('2d');
+  const labels = renewalData.map(data => data.start_date);
+  const statuses = renewalData.map(data => data.status);
   const chart = new Chart(ctx, {
     type: 'line',
     data: chartData,
@@ -74,6 +63,7 @@ const renewalData = [
               const data = renewalData[index];
               return [
                 `Product: ${data.productName}`,
+                `Renewal Start Date: ${data.startDate}`,
                 `Sign-off Date: ${data.signOffDate}`,
                 `Contract Duration: ${data.contractDuration}`,
                 `Consulting Hours: ${data.consultingHours}`,
@@ -84,27 +74,27 @@ const renewalData = [
       },
     },
   });
-  
+
   document.getElementById('renewal-chart').onclick = function (evt) {
     const activePoints = chart.getElementsAtEventForMode(evt, 'nearest', { intersect: true }, true);
-  
+
     const renewalInfo = document.getElementById('renewal-info');
-  
+
     if (activePoints.length > 0) {
       const dataIndex = activePoints[0].index;
       const data = renewalData[dataIndex];
-  
+
       renewalInfo.innerHTML = `
-        <h3>${data.productName}</h3>
+        <h3>Service: ${data.productName}</h3>
+        <p>Renewal Start Date: ${data.startDate}</p>
         <p>Sign-off Date: ${data.signOffDate}</p>
         <p>Contract Duration: ${data.contractDuration}</p>
-        <p>Price: $${data.price}</p>
-        <p>Consulting Hours: ${data.consultingHours} hours/quarter</p>
+        <p>Subscription Price: $${data.price}</p>
+        <p>Consulting Hours: ${data.consultingHours} hours per quarter</p>
       `;
       renewalInfo.style.display = "block";
     } else {
       renewalInfo.style.display = "none";
     }
   };
-  
-  
+});

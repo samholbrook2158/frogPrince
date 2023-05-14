@@ -2,71 +2,76 @@
 <html>
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Renewal</title>
-    <link rel="stylesheet" href="/css/renewal.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Renewal</title>
+  <link rel="stylesheet" href="/css/renewal.css" />
 </head>
 
 <body>
-    <%- include('./partials/navbar') %>
-        <div class="content-wrapper">
-            <h2>Add New Renewal</h2>
-            <div class="search-container">
-                <input type="text" id="search-external" placeholder="Search external contacts"
-                    onkeyup="filterList('external')" />
-                    <ul id="external-list" class="user-list">
-                        <% externals.forEach(function(external) { %>
-                          <li class="user" data-friendship-id="<%= external.friend_id %>">
-                            <a href="#">
-                              <%= external.friend_name %>
-                            </a>
-                          </li>
-                        <% }) %>
-                      </ul>                      
-                      
-                <form action="/renewal" method="POST">
-                    <input type="hidden" id="friendship_id" name="friendship_id" />
+  <%- include('./partials/navbar') %>
+    <div class="content-wrapper">
+      <h2>Add New Renewal</h2>
+      <div class="search-container">
+        <input type="text" id="search-external" placeholder="Search external contacts"
+          onkeyup="filterList('external')" />
+        <ul id="external-list" class="user-list">
+          <% externals.forEach(function(external) { %>
+            <li class="user" data-user-id="<%= external.friend_id %>">
+              <a href="#">
+                <%= external.friend_name %>
+              </a>
+            </li>
+            <% }) %>
+        </ul>
 
-                    <label for="product_name">Product Name:</label>
-                    <input type="text" id="product_name" name="product_name" required />
+        <form action="/renewal" method="POST">
+          <input type="hidden" id="user_id" name="user_id" />
+          <input type="hidden" id="friend_id" name="friend_id" />
 
-                    <label for="start_date">Start Date:</label>
-                    <input type="date" id="start_date" name="start_date" required />
+          <label for="product_name">Product Name:</label>
+          <input type="text" id="product_name" name="product_name" required />
 
-                    <label for="end_date">End Date:</label>
-                    <input type="date" id="end_date" name="end_date" required />
+          <label for="start_date">Start Date:</label>
+          <input type="date" id="start_date" name="start_date" required />
 
-                    <label for="details">Details:</label>
-                    <input type="text" id="details" name="details" required />
+          <label for="end_date">End Date:</label>
+          <input type="date" id="end_date" name="end_date" required />
 
-                    <label for="status">Status:</label>
-                    <input type="text" id="status" name="status" required />
+          <label for="renewal_date">Renewal Date:</label>
+          <input type="date" id="renewal_date" name="renewal_date" required />
 
-                    <input type="submit" value="Submit" />
-                </form>
+          <label for="contract_duration">Contract Duration</label>
+          <input type="text" class="form-control" id="contract_duration" name="contract_duration" required>
 
-            </div>
-            <script>
-                function filterList(userType) {
-                    // your existing code here...
-                }
-            
-                function addClickListenersToUsers() {
-                    document.querySelectorAll('.user').forEach((userListItem) => {
-                        userListItem.addEventListener('click', (event) => {
-                            event.preventDefault();
-                            const friendshipId = event.target.closest('.user').getAttribute('data-friendship-id');
-                            console.log('Friendship ID: ', friendshipId); // Add this line
-                            document.getElementById('friendship_id').value = friendshipId;
-                        });
-                    });
-                }
-            
-                // Call this function whenever your `externals` data is updated
-                addClickListenersToUsers();
-            </script>
-            
+          <label for="price">Price:</label>
+          <input type="number" id="price" name="price" required />
+
+          <label for="details">Details:</label>
+          <input type="text" id="details" name="details" required />
+
+          <label for="consulting_hours">Consulting Hours</label>
+          <input type="number" class="form-control" id="consulting_hours" name="consulting_hours" required>
+
+          <label for="status">Status:</label>
+          <input type="text" id="status" name="status" required />
+
+          <input type="submit" value="Submit" />
+        </form>
+
+      </div>
+      <script>
+        function addClickListenersToUsers() {
+          document.querySelectorAll('.user').forEach((userListItem) => {
+            userListItem.addEventListener('click', (event) => {
+              event.preventDefault();
+              const friendId = event.currentTarget.getAttribute('data-user-id');
+              document.getElementById('friend_id').value = friendId;
+            });
+          });
+        }
+        addClickListenersToUsers();
+      </script>
 
 </body>
 

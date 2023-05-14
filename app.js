@@ -5,14 +5,10 @@ const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const mysql = require("mysql");
 const flash = require('connect-flash');
-
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-
 app.use(flash());
-
 const ExpressApp = require("./Express.js");
-
 const db = mysql.createConnection({
     host: "localhost",
     user: "root",

@@ -15,7 +15,8 @@
   </head>
   <body>
     <div class="container">
-      <h1>Signup</h1>
+      <div class="logo"></div>
+      <div class="title"><h1>Create your account</h1></div>
       <% if (typeof error !== 'undefined' && error) { %>
       <div class="error"><%= error %></div>
       <% } %>
@@ -31,14 +32,12 @@
           type="password"
           id="password"
           name="password"
-          required
-        /><br /><br />
+          required /><br /><br />
 
         <label for="organization">Organization:</label>
         <input type="text" id="organization" name="organization" /><br /><br />
         <label for="role">Role:</label>
         <input type="text" id="role" name="role" /><br /><br />
-
 
         <button type="submit">Signup</button>
       </form>

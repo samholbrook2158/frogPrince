@@ -18,3 +18,145 @@
     cursor: pointer;
   }
   
+/* Body styling */
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f2f2f2;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  margin-right: 10px;
+}
+.form-container {
+  position: relative;
+  text-align: center;
+}
+.error-message {
+  display: inline-block;
+  color: red;
+  border: 1px solid red;
+  border-radius: 5px;
+  padding: 5px;
+  margin-top: 1px;
+  margin-bottom: 20px;
+}
+.logo {
+  display: block;
+  margin: 50px auto;
+  width: 150px;
+  height: 150px;
+  background-image: url("/images/frogPrince.avif");
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: 1px solid black;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+.title {
+  font-family: 'Nordique Inline', sans-serif;
+  display: block;
+  margin: 0 auto;
+  text-align: center;
+  border: 2px solid #333;
+  padding: 10px;
+  width: 30%;
+  margin-bottom: 10px;
+}
+
+/* Form styling */
+form {
+  max-width: 500px;
+  margin: 100px auto;
+  margin-top: -1px;
+  margin-bottom: 10px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+/* Label styling */
+label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+/* Input styling */
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+  width: 95%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: 1px solid black;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Button styling */
+button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button[type="submit"].login-button {
+  background-color: #4CAF50;
+  color: #fff;
+}
+
+button[type="submit"].login-button:hover {
+  background-color: #3e8e41;
+}
+
+button[type="submit"].signup-button {
+  background-color: #2196F3;
+  color: #fff;
+}
+
+button[type="submit"].signup-button:hover {
+  background-color: #0c7cd5;
+}
+
+
+/* Error message styling */
+#error-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+#error-container p {
+  color: #ff3333;
+  font-weight: bold;
+  margin: 0;
+}
+
+/* Create account button styling */
+form:last-of-type button[type="submit"] {
+  display: block;
+  width: 100%;
+  padding: 10px;
+  background-color: #2196F3;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+form:last-of-type button[type="submit"]:hover {
+  background-color: #0c7cd5;
+}
