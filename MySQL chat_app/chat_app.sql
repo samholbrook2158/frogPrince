@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 14, 2023 at 06:23 AM
+-- Generation Time: May 14, 2023 at 09:46 AM
 -- Server version: 10.4.28-MariaDB
 -- PHP Version: 8.2.4
 
@@ -44,7 +44,6 @@ INSERT INTO `friendships` (`id`, `user_id`, `friend_id`, `status`, `is_colleague
 (15, 4, 8, 'accepted', 1),
 (20, 4, 10, 'pending', 1),
 (21, 4, 5, 'accepted', 0),
-(22, 4, 3, 'pending', 0),
 (23, 5, 4, 'accepted', 0);
 
 -- --------------------------------------------------------
@@ -71,7 +70,10 @@ CREATE TABLE `friend_chats` (
 INSERT INTO `friend_chats` (`id`, `sender_id`, `receiver_id`, `message`, `timestamp`, `original_filename`, `file_path`, `is_read`) VALUES
 (44, 4, 8, 'Hey', '2023-05-14 03:45:44', NULL, NULL, 0),
 (45, 4, 5, 'Hi', '2023-05-14 04:22:39', NULL, NULL, 1),
-(46, 5, 4, 'Hey', '2023-05-14 04:22:51', NULL, NULL, 0);
+(46, 5, 4, 'Hey', '2023-05-14 04:22:51', NULL, NULL, 1),
+(47, 4, 12, 'Hey', '2023-05-14 07:40:50', NULL, NULL, 1),
+(48, 4, 12, 'I dont like these terms lets talk about this', '2023-05-14 07:42:40', NULL, NULL, 0),
+(49, 4, 12, 'blah blah blah', '2023-05-14 07:42:49', 'UFCFFF-30-3 GDPR Permission form.docx', 'uploads\\UFCFFF-30-3 GDPR Permission form.docx', 0);
 
 -- --------------------------------------------------------
 
@@ -94,6 +96,15 @@ CREATE TABLE `renewals` (
   `consulting_hours` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `renewals`
+--
+
+INSERT INTO `renewals` (`id`, `product_name`, `start_date`, `end_date`, `details`, `status`, `user_id`, `friend_id`, `price`, `renewal_date`, `contract_duration`, `consulting_hours`) VALUES
+(28, 'Test', '2023-05-02', '2023-05-18', 'Test', 'Ongoing', 4, 5, 12000.00, '2023-05-01', '12 Months', 12),
+(29, 'test', '2023-05-01', '2023-05-11', 'Test', 'Upcoming', 4, 5, 1200000.00, '2023-05-10', '12 Months', 12),
+(30, 'Sam', '2023-05-21', '2023-05-28', 'Test', 'Upcoming', 12, 4, 500000.00, '2023-05-16', '2 weeks', 2);
+
 -- --------------------------------------------------------
 
 --
@@ -114,11 +125,11 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password`, `Email`, `organization`, `role`) VALUES
-(3, 'test', 'test', 'test@gmail.com', 'test', 'Solutions consultant'),
 (4, 'demo', 'demo', 'demo', 'demo', 'Solutions consultant'),
 (5, 'uwe', 'uwe', 'uwe@uwe.com', 'uwe', 'uwe'),
 (8, 'demo5', 'demo', 'demo5@demo5', 'demo', 'Sales manager'),
-(10, 'John-Appleseed', 'John', 'John@Appleseed.com', 'demo', 'HR Manager');
+(10, 'John-Appleseed', 'John', 'John@Appleseed.com', 'demo', 'HR Manager'),
+(12, 'sam', 'sam', 'sam@gmail.com', 'sam', 'Solutions consultant');
 
 --
 -- Indexes for dumped tables
@@ -159,25 +170,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `friendships`
 --
 ALTER TABLE `friendships`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- AUTO_INCREMENT for table `friend_chats`
 --
 ALTER TABLE `friend_chats`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=47;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
 
 --
 -- AUTO_INCREMENT for table `renewals`
 --
 ALTER TABLE `renewals`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=31;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- Constraints for dumped tables
